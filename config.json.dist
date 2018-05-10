@@ -1,0 +1,15 @@
+{
+  "environment": "development",
+  "server":{
+    "port": 3002
+  },
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "gifcept"
+  },
+  "authentication": {
+    "jwtSecret": "RANDMON STRING",
+    "jwtExpiration": "30m"
+  }
+}
