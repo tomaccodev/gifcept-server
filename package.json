@@ -1,7 +1,6 @@
 {
   "name": "gifcept-server",
   "version": "1.0.0",
-  "main": "server.js",
   "repository": "git@github.com:tomaccodev/gifcept-server.git",
   "author": {
     "name": "Dani Lupión",
@@ -9,14 +8,15 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "jest",
+    "start": "node src/server.js",
+    "seed": "node src/commands/seed.js"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.2.1",
-    "mongoose": "^5.0.18",
+    "mongoose": "^5.1.0",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0"
@@ -24,6 +24,7 @@
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.11.0"
+    "eslint-plugin-import": "^2.11.0",
+    "jest": "^22.4.3"
   }
 }
