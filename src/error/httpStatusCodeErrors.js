@@ -12,12 +12,13 @@ const ERROR_CODES = {
  * @param {string} message
  * @return {class}
  */
-const statusCodeFactory = (statusCode, message) => class StatusCodeError extends Error {
-  constructor(errorMessage = message) {
-    super(errorMessage);
-    this.statusCode = statusCode;
-  }
-};
+const statusCodeFactory = (statusCode, message) =>
+  class StatusCodeError extends Error {
+    constructor(errorMessage = message) {
+      super(errorMessage);
+      this.statusCode = statusCode;
+    }
+  };
 
 // Module exports will look like { BadRequest: <class>, ...}
 module.exports = Object.keys(ERROR_CODES).reduce(
@@ -25,5 +26,5 @@ module.exports = Object.keys(ERROR_CODES).reduce(
     ...accumulated,
     [ERROR_CODES[code].replace(/ /g, '')]: statusCodeFactory(code, ERROR_CODES[code]),
   }),
-  {}
+  {},
 );

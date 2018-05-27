@@ -14,16 +14,19 @@ const ownerPlugin = require('./owner');
  * @param {boolean} timestamps
  * @param {object} timestampsOptions
  */
-module.exports = (schema, {
-  field = 'comments',
-  required = false,
-  multiple = true,
-  defaultValue = multiple ? [] : null,
-  author = true,
-  authorOptions = { field: 'author' },
-  timestamps = true,
-  timestampsOptions = {},
-} = {}) => {
+module.exports = (
+  schema,
+  {
+    field = 'comments',
+    required = false,
+    multiple = true,
+    defaultValue = multiple ? [] : null,
+    author = true,
+    authorOptions = { field: 'author' },
+    timestamps = true,
+    timestampsOptions = {},
+  } = {},
+) => {
   const commentSchema = new Schema({
     text: {
       type: String,

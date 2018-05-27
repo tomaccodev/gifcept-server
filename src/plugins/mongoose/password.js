@@ -9,15 +9,18 @@ const bcrypt = require('bcrypt');
  * @param {RegExp} match
  * @param {string} doesNotMatchMessage
  */
-module.exports = (schema, {
-  field = 'password',
-  required = true,
-  saltingRounds = 10,
-  comparisonFunction = 'comparePassword',
-  // eslint-disable-next-line no-useless-escape
-  match = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%\^\&*\)\(\]\[\+=\.,_-]).{8,}$/,
-  doesNotMatchMessage = `${field} must be at least 8 chars, contain 1 number, lower and upper case and special char`,
-} = {}) => {
+module.exports = (
+  schema,
+  {
+    field = 'password',
+    required = true,
+    saltingRounds = 10,
+    comparisonFunction = 'comparePassword',
+    // eslint-disable-next-line no-useless-escape
+    match = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%\^\&*\)\(\]\[\+=\.,_-]).{8,}$/,
+    doesNotMatchMessage = `${field} must be at least 8 chars, contain 1 number, lower and upper case and special char`,
+  } = {},
+) => {
   const fieldDescription = {
     [field]: {
       type: String,
@@ -45,7 +48,6 @@ module.exports = (schema, {
 
   // eslint-disable-next-line no-param-reassign
   schema.methods[comparisonFunction] = function comparePassword(candidate) {
-    return bcrypt.compare(candidate, this.password)
-      .catch(() => false);
+    return bcrypt.compare(candidate, this.password).catch(() => false);
   };
 };

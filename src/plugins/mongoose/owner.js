@@ -9,11 +9,7 @@ const { ObjectId } = Schema;
  * @param {boolean} required
  * @param {string} ref
  */
-module.exports = (schema, {
-  field = 'user',
-  required = true,
-  ref = 'User',
-} = {}) => {
+module.exports = (schema, { field = 'user', required = true, ref = 'User' } = {}) => {
   schema.add({
     [field]: {
       type: ObjectId,

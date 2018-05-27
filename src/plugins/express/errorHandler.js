@@ -26,7 +26,7 @@ module.exports = {
    * @param {function} next
    */
   responseErrorHandler: (req, res, next) => {
-    res.errorHandler = (err) => {
+    res.errorHandler = err => {
       handleError(err, res);
     };
 

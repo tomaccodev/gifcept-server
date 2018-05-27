@@ -62,7 +62,7 @@ process.on('unhandledRejection', (reason, p) => {
   console.error('Unhandled Rejection at:', p, 'reason:', reason);
 });
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', err => {
   // eslint-disable-next-line no-console
   console.error('Caught exception:', err.stack, err);
 });

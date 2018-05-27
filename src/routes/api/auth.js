@@ -12,27 +12,28 @@ const router = new express.Router();
  * @param {User} user
  * @return {Promise}
  */
-const generateToken = user => new Promise((res, rej) => {
-  sign(
-    {
-      // eslint-disable-next-line no-underscore-dangle
-      userId: user._id,
-      username: user.username,
-      role: user.role,
-    },
-    config.authentication.jwtSecret,
-    {
-      expiresIn: config.authentication.jwtExpiration,
-    },
-    (err, token) => {
-      if (err) {
-        return rej();
-      }
+const generateToken = user =>
+  new Promise((res, rej) => {
+    sign(
+      {
+        // eslint-disable-next-line no-underscore-dangle
+        userId: user._id,
+        username: user.username,
+        role: user.role,
+      },
+      config.authentication.jwtSecret,
+      {
+        expiresIn: config.authentication.jwtExpiration,
+      },
+      (err, token) => {
+        if (err) {
+          return rej();
+        }
 
-      return res(token);
-    }
-  );
-});
+        return res(token);
+      },
+    );
+  });
 
 /**
  * Route: /api/auth/token

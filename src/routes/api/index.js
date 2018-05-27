@@ -6,7 +6,7 @@ const express = require('express');
 const router = new express.Router();
 
 // Loop over files in this folder
-fs.readdirSync(__dirname).forEach((file) => {
+fs.readdirSync(__dirname).forEach(file => {
   const fileName = path.basename(file, path.extname(file));
   const filePath = path.join(__dirname, file);
 

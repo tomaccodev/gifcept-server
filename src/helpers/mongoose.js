@@ -6,7 +6,9 @@ mongoose.Promise = Promise;
 
 let connectionPromise = null;
 
-const MONGODB_URI = `mongodb://${config.mongodb.host}:${config.mongodb.port}/${config.mongodb.database}`;
+const MONGODB_URI = `mongodb://${config.mongodb.host}:${config.mongodb.port}/${
+  config.mongodb.database
+}`;
 
 module.exports = () => {
   if (connectionPromise === null) {

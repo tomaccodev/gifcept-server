@@ -4,11 +4,7 @@
  * @param {boolean} required
  * @param {*} defaultValue
  */
-module.exports = (schema, {
-  field = 'tags',
-  required = false,
-  defaultValue = [],
-} = {}) => {
+module.exports = (schema, { field = 'tags', required = false, defaultValue = [] } = {}) => {
   schema.add({
     [field]: {
       type: [String],

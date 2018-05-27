@@ -8,15 +8,18 @@
  * @param {boolean|int} indexUpdate
  * @param {boolean} updateTimestampOnCreation
  */
-module.exports = (schema, {
-  creation = true,
-  update = true,
-  creationField = 'created',
-  updateField = 'updated',
-  indexCreation = false,
-  indexUpdate = false,
-  updateTimestampOnCreation = false,
-} = {}) => {
+module.exports = (
+  schema,
+  {
+    creation = true,
+    update = true,
+    creationField = 'created',
+    updateField = 'updated',
+    indexCreation = false,
+    indexUpdate = false,
+    updateTimestampOnCreation = false,
+  } = {},
+) => {
   if (creation) {
     schema.add({ [creationField]: Date });
   }
@@ -33,9 +36,7 @@ module.exports = (schema, {
         this[creationField] = now;
       }
       if (update) {
-        this[updateField] = (updateTimestampOnCreation || !this.isNew)
-          ? now
-          : null;
+        this[updateField] = updateTimestampOnCreation || !this.isNew ? now : null;
       }
       next();
     } catch (err) {

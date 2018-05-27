@@ -1,6 +1,6 @@
 {
   "name": "gifcept-server",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "repository": "git@github.com:tomaccodev/gifcept-server.git",
   "author": {
     "name": "Dani Lupión",
@@ -9,8 +9,25 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
+    "test-watch": "jest --watch",
     "start": "node src/server.js",
-    "seed": "node src/commands/seed.js"
+    "seed": "node src/commands/seed.js",
+    "pretty": "prettier --write",
+    "pretty-all": "yarn pretty \"{src,__tests__}/**/*.js\"",
+    "lint": "eslint",
+    "lint-all": "yarn lint {src,__tests__}/**/*.js",
+    "precommit": "lint-staged && yarn test"
+  },
+  "lint-staged": {
+    "*.js": [
+      "yarn pretty",
+      "yarn lint",
+      "git add"
+    ]
+  },
+  "jest": {
+    "verbose": true,
+    "testMatch": ["**/__tests__/**/*.js"]
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
@@ -25,6 +42,10 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
-    "jest": "^22.4.3"
+    "husky": "^0.14.3",
+    "jest": "23.0.0",
+    "lint-staged": "^7.1.2",
+    "mockingoose": "^2.10.1",
+    "prettier": "^1.12.1"
   }
 }

@@ -3,12 +3,15 @@
  * @param {object} rename
  * @param string[] remove
  */
-module.exports = (schema, {
-  rename = {
-    _id: 'id',
-  },
-  remove = ['__v'],
-} = {}) => {
+module.exports = (
+  schema,
+  {
+    rename = {
+      _id: 'id',
+    },
+    remove = ['__v'],
+  } = {},
+) => {
   schema.set('toJSON', {
     transform: (doc, json) => {
       /* eslint-disable no-param-reassign, no-restricted-syntax */

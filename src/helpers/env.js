@@ -9,9 +9,11 @@ module.exports = {
    * Environment setter
    * @param {string} env
    */
-  setEnvironment: (env) => {
+  setEnvironment: env => {
     // Check that provided env is supported otherwise use production
-    process.env.NODE_ENV = Object.keys(ENVIRONMENTS).map(key => ENVIRONMENTS[key]).includes(env)
+    process.env.NODE_ENV = Object.keys(ENVIRONMENTS)
+      .map(key => ENVIRONMENTS[key])
+      .includes(env)
       ? env
       : ENVIRONMENTS.production;
   },
