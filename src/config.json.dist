@@ -11,5 +11,6 @@
   "authentication": {
     "jwtSecret": "RANDMON STRING",
     "jwtExpiration": "30m"
-  }
+  },
+  "gifsUploadDir": "/path/to/wherever"
 }

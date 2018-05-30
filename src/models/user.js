@@ -28,6 +28,4 @@ const UserSchema = new mongoose.Schema(
   .plugin(password)
   .plugin(timestamps);
 
-const model = mongoose.model('User', UserSchema);
-
-module.exports = model;
+module.exports = mongoose.model('User', UserSchema);

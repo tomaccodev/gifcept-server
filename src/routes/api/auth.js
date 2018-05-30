@@ -2,7 +2,11 @@ const express = require('express');
 const { sign } = require('jsonwebtoken');
 
 const config = require('../../config.json');
-const { Unauthorized } = require('../../error/httpStatusCodeErrors');
+const {
+  Unauthorized,
+  BadRequest,
+  InternalServerError,
+} = require('../../error/httpStatusCodeErrors');
 const { User } = require('../../models');
 
 const router = new express.Router();
@@ -43,20 +47,23 @@ const generateToken = user =>
  */
 router.post('/token', async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.body.username });
+    if (req.body.username && req.body.password) {
+      const user = await User.findOne({ username: req.body.username });
 
-    if (!user) {
-      return res.errorHandler(new Unauthorized());
+      if (!user) {
+        return res.errorHandler(new Unauthorized());
+      }
+
+      const match = user.comparePassword(req.body.password);
+      if (!match) {
+        return res.errorHandler(new Unauthorized());
+      }
+
+      return res.send({ token: await generateToken(user) });
     }
-
-    const match = user.comparePassword(req.body.password);
-    if (!match) {
-      return res.errorHandler(new Unauthorized());
-    }
-
-    return res.send({ token: await generateToken(user) });
+    return res.errorHandler(new BadRequest());
   } catch (err) {
-    return res.errorHandler(err);
+    return res.errorHandler(new InternalServerError(err));
   }
 });
 
