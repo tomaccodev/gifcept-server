@@ -8,7 +8,7 @@ const passport = require('passport');
 const config = require('./config.json');
 const connectMongoose = require('./helpers/mongoose');
 const { setEnvironment } = require('./helpers/env');
-const { errorHandler, responseErrorHandler } = require('./plugins/express/errorHandler');
+const { errorHandler, responseErrorHandler } = require('./middlewares/express/errorHandler');
 const api = require('./routes/api');
 
 setEnvironment(config.environment);

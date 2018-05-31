@@ -12,5 +12,6 @@
     "jwtSecret": "RANDMON STRING",
     "jwtExpiration": "30m"
   },
-  "gifsUploadDir": "/path/to/wherever"
+  "uploadDir": "/path/to/wherever",
+  "gifsDir": "/path/to/wherever"
 }

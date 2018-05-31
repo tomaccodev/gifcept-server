@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const timestamps = require('../plugins/mongoose/timestamps');
+const timestamps = require('../middlewares/mongoose/timestamps');
 
 const TagSchema = new mongoose.Schema(
   {

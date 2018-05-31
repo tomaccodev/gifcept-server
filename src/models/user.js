@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 const roles = require('../constants/userRoles');
-const normalizeJSON = require('../plugins/mongoose/normalizeJSON');
-const email = require('../plugins/mongoose/email');
-const password = require('../plugins/mongoose/password');
-const timestamps = require('../plugins/mongoose/timestamps');
+const normalizeJSON = require('../middlewares/mongoose/normalizeJSON');
+const email = require('../middlewares/mongoose/email');
+const password = require('../middlewares/mongoose/password');
+const timestamps = require('../middlewares/mongoose/timestamps');
 
 const UserSchema = new mongoose.Schema(
   {

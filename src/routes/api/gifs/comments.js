@@ -1,8 +1,8 @@
 const express = require('express');
 
 const { InternalServerError, BadRequest } = require('../../../error/httpStatusCodeErrors');
-const jwtAuthMiddleware = require('../../../plugins/express/jwt-auth');
-const userMiddleware = require('../../../plugins/express/user');
+const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
+const userMiddleware = require('../../../middlewares/express/user');
 
 const router = new express.Router();
 

@@ -35,4 +35,6 @@ Thumbs.db
 # Backend config
 config.json
 
+# Uploaded assets
 /gifs
+/upload

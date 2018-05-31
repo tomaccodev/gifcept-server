@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const ratings = require('../constants/ratings');
-const owner = require('../plugins/mongoose/owner');
-const timestamps = require('../plugins/mongoose/timestamps');
-const comments = require('../plugins/mongoose/comments');
+const owner = require('../middlewares/mongoose/owner');
+const timestamps = require('../middlewares/mongoose/timestamps');
+const comments = require('../middlewares/mongoose/comments');
 
 const TagSchema = new mongoose.Schema(
   {
@@ -66,6 +66,7 @@ const GifSchema = new mongoose.Schema(
     rating: {
       type: String,
       required: true,
+      default: ratings.sfw,
       enum: Object.keys(ratings).map(roleKey => ratings[roleKey]),
       index: true,
     },

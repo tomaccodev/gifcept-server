@@ -1,9 +1,5 @@
 const express = require('express');
 const fs = require('fs');
-const { parse } = require('url');
-const http = require('http');
-const https = require('https');
-const crypto = require('crypto');
 const path = require('path');
 const { v4 } = require('uuid');
 
@@ -13,37 +9,17 @@ const {
   InternalServerError,
   BadRequest,
 } = require('../../../error/httpStatusCodeErrors');
-const jwtAuthMiddleware = require('../../../plugins/express/jwt-auth');
-const userMiddleware = require('../../../plugins/express/user');
-const { Gif } = require('../../../models');
+const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
+const userMiddleware = require('../../../middlewares/express/user');
+const { Gif, GifFile } = require('../../../models');
+const download = require('../../../utils/download');
+const { getSize } = require('../../../utils/images');
+const { getFileSize } = require('../../../utils/files');
+const { saveFrameFromGif } = require('../../../utils/images');
 
 const router = new express.Router();
 
 const PAGE_SIZE = 20;
-
-// Helper for downloading gifs
-const download = (url, dest) =>
-  new Promise((acc, rej) => {
-    const { protocol } = parse(url);
-
-    const get = protocol === 'https:' ? https.get : http.get;
-    const file = fs.createWriteStream(dest);
-
-    get(url, res => {
-      const md5sum = crypto.createHash('md5');
-
-      res.on('data', d => {
-        md5sum.update(d);
-      });
-
-      res.pipe(file);
-
-      file.on('finish', () => acc(md5sum.digest('hex')));
-    }).on('error', err => {
-      fs.unlink(dest);
-      return rej(err);
-    });
-  });
 
 router.param('id', async (req, res, next, id) => {
   try {
@@ -89,13 +65,48 @@ router.get('/', async (req, res) => {
 router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
   try {
     if (req.body.url) {
-      const tempFile = path.join(config.gifsUploadDir, `${v4()}.gif`);
+      const tempPath = path.join(config.uploadDir, `${v4()}.gif`);
 
-      const md5checksum = await download(req.body.url, tempFile);
-      return res.json({
-        sucess: true,
-        md5checksum,
+      const md5checksum = await download(req.body.url, tempPath);
+      let gifFile = await GifFile.findOne({ md5checksum });
+
+      if (!gifFile) {
+        const { width, height } = await getSize(tempPath);
+        const fileSize = await getFileSize(tempPath);
+        const framePath = path.join(
+          config.uploadDir,
+          `${path.basename(tempPath, path.extname(tempPath))}.png`,
+        );
+
+        await saveFrameFromGif(tempPath, framePath);
+        const frameFileSize = await getFileSize(framePath);
+
+        gifFile = await GifFile.create({
+          md5checksum,
+          width,
+          height,
+          fileSize,
+          frameFileSize,
+          importationUrls: [
+            {
+              url: req.body.url,
+            },
+          ],
+        });
+      } else if (!gifFile.importationUrls.some(i => i.url === req.body.url)) {
+        gifFile.importationUrls.push({
+          url: req.body.url,
+        });
+
+        await gifFile.save();
+      }
+
+      const gif = await Gif.create({
+        gifFile,
+        user: req.user,
       });
+
+      return res.json(gif.toJSON());
     }
     return res.errorHandler(new BadRequest());
   } catch (err) {
@@ -115,7 +126,7 @@ fs.readdirSync(__dirname).forEach(file => {
 
   // Register route with the same name as the file
   // eslint-disable-next-line import/no-dynamic-require, global-require
-  router.use(`/:season/${fileName}`, require(`./${fileName}`));
+  router.use(`/:id/${fileName}`, require(`./${fileName}`));
 });
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const ratings = require('../constants/ratings');
-const timestamps = require('../plugins/mongoose/timestamps');
+const timestamps = require('../middlewares/mongoose/timestamps');
 
 const ImportationUrlSchema = new mongoose.Schema(
   {
@@ -28,11 +28,11 @@ const GifFileSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    size: {
+    fileSize: {
       type: Number,
       required: true,
     },
-    frameSize: {
+    frameFileSize: {
       type: Number,
       required: true,
     },
@@ -40,15 +40,9 @@ const GifFileSchema = new mongoose.Schema(
       type: [ImportationUrlSchema],
       default: [],
     },
-    rating: {
+    moderatedRating: {
       type: String,
-      required: true,
       enum: Object.keys(ratings).map(roleKey => ratings[roleKey]),
-      index: true,
-    },
-    moderated: {
-      type: Boolean,
-      default: false,
     },
   },
   { collection: 'gifFiles' },
