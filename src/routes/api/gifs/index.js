@@ -14,7 +14,7 @@ const userMiddleware = require('../../../middlewares/express/user');
 const { Gif, GifFile } = require('../../../models');
 const download = require('../../../utils/download');
 const { getSize } = require('../../../utils/images');
-const { getFileSize } = require('../../../utils/files');
+const { getFileSize, move } = require('../../../utils/files');
 const { saveFrameFromGif } = require('../../../utils/images');
 
 const router = new express.Router();
@@ -93,6 +93,13 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
             },
           ],
         });
+
+        await Promise.all([
+          // eslint-disable-next-line no-underscore-dangle
+          move(tempPath, path.join(config.gifsDir, `${gifFile._id}.gif`)),
+          // eslint-disable-next-line no-underscore-dangle
+          move(framePath, path.join(config.gifsDir, `${gifFile._id}.png`)),
+        ]);
       } else if (!gifFile.importationUrls.some(i => i.url === req.body.url)) {
         gifFile.importationUrls.push({
           url: req.body.url,
