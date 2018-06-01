@@ -21,6 +21,29 @@ const router = new express.Router();
 
 const PAGE_SIZE = 20;
 
+const serializeGif = async gif => {
+  await gif.populate('user').execPopulate();
+
+  const { id, description, user, created, comments, views, likes, shares } = gif.toJSON();
+
+  return {
+    id,
+    description,
+    user: {
+      id: user.id,
+      username: user.username,
+    },
+    created,
+    comments: [],
+    commentsCount: comments.length,
+    likes: [],
+    likesCount: likes.length,
+    shares: [],
+    sharesCount: shares.length,
+    viewsCount: views,
+  };
+};
+
 router.param('id', async (req, res, next, id) => {
   try {
     const gif = await Gif.findOne({
@@ -50,7 +73,7 @@ router.get('/', async (req, res) => {
       .limit(PAGE_SIZE)
       .sort({ created: -1 });
 
-    return res.send(gifs);
+    return res.send(await Promise.all(gifs.map(serializeGif)));
   } catch (err) {
     return res.errorHandler(new InternalServerError(err));
   }

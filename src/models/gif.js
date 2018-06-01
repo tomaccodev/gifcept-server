@@ -4,6 +4,7 @@ const ratings = require('../constants/ratings');
 const owner = require('../middlewares/mongoose/owner');
 const timestamps = require('../middlewares/mongoose/timestamps');
 const comments = require('../middlewares/mongoose/comments');
+const normalizeJSON = require('../middlewares/mongoose/normalizeJSON');
 
 const TagSchema = new mongoose.Schema(
   {
@@ -91,6 +92,7 @@ const GifSchema = new mongoose.Schema(
 )
   .plugin(owner)
   .plugin(timestamps, { indexCreation: true })
-  .plugin(comments);
+  .plugin(comments)
+  .plugin(normalizeJSON);
 
 module.exports = mongoose.model('Gif', GifSchema);

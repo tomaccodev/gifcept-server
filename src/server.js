@@ -10,6 +10,7 @@ const connectMongoose = require('./helpers/mongoose');
 const { setEnvironment } = require('./helpers/env');
 const { errorHandler, responseErrorHandler } = require('./middlewares/express/errorHandler');
 const api = require('./routes/api');
+const images = require('./routes/images');
 
 setEnvironment(config.environment);
 
@@ -36,6 +37,9 @@ const createServerAsync = async () => {
 
     // Register API routes
     app.use('/api', api);
+
+    // Register image retrieval routes
+    app.use('/', images);
 
     // Register custom error handler (should registered last be last)
     app.use(errorHandler);

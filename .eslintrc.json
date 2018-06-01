@@ -8,6 +8,7 @@
     "arrow-parens": ["error", "as-needed"],
     "comma-dangle": ["error", "always-multiline"],
     "function-paren-newline": ["error", "consistent"],
+    "object-curly-newline": ["error", { "consistent": true }],
     "import/no-extraneous-dependencies": [
       "error",
       {
