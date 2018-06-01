@@ -11,6 +11,7 @@
     "test": "jest",
     "test-watch": "jest --watch",
     "start": "node src/server.js",
+    "start-watch": "gulp watch",
     "seed": "node src/commands/seed.js",
     "pretty": "prettier --write",
     "pretty-all": "yarn pretty \"{src,__tests__}/**/*.js\"",
@@ -46,10 +47,13 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
+    "gulp": "4.0.0",
+    "gulp-develop-server": "^0.5.2",
+    "gulp-watch": "^5.0.0",
     "husky": "^0.14.3",
     "jest": "23.1.0",
-    "lint-staged": "^7.1.2",
+    "lint-staged": "^7.1.3",
     "mockingoose": "^2.10.1",
-    "prettier": "^1.13.3"
+    "prettier": "^1.13.4"
   }
 }
