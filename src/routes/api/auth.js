@@ -54,7 +54,7 @@ router.post('/token', async (req, res) => {
         return res.errorHandler(new Unauthorized());
       }
 
-      const match = user.comparePassword(req.body.password);
+      const match = await user.comparePassword(req.body.password);
       if (!match) {
         return res.errorHandler(new Unauthorized());
       }

@@ -48,7 +48,7 @@ const serializeGif = async gif => {
 router.param('id', async (req, res, next, id) => {
   try {
     const gif = await Gif.findOne({
-      _id: id,
+      shortId: id,
     });
 
     if (!gif) {

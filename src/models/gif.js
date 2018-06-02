@@ -1,58 +1,38 @@
 const mongoose = require('mongoose');
 
 const ratings = require('../constants/ratings');
-const shortid = require('../middlewares/mongoose/shortid');
+const shortId = require('../middlewares/mongoose/shortId');
 const owner = require('../middlewares/mongoose/owner');
 const timestamps = require('../middlewares/mongoose/timestamps');
 const comments = require('../middlewares/mongoose/comments');
 const normalizeJSON = require('../middlewares/mongoose/normalizeJSON');
 
-const TagSchema = new mongoose.Schema(
-  {
-    tag: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Tag',
-      required: true,
-      index: true,
-    },
-    name: {
-      type: String,
-      required: true,
-      index: true,
-    },
+const TagSchema = new mongoose.Schema({
+  tag: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Tag',
+    required: true,
+    index: true,
   },
-  { _id: false },
-).plugin(timestamps, { update: false });
+  name: {
+    type: String,
+    required: true,
+    index: true,
+  },
+}).plugin(timestamps, { update: false });
 
-const LikeSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true,
-    },
-  },
-  { _id: false },
-).plugin(timestamps, { update: false });
+const LikeSchema = new mongoose.Schema({}).plugin(owner).plugin(timestamps, { update: false });
 
-const ShareSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true,
-    },
-    gif: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Gif',
-      required: true,
-      index: true,
-    },
+const ShareSchema = new mongoose.Schema({
+  gif: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Gif',
+    required: true,
+    index: true,
   },
-  { _id: false },
-).plugin(timestamps, { update: false });
+})
+  .plugin(owner)
+  .plugin(timestamps, { update: false });
 
 const GifSchema = new mongoose.Schema(
   {
@@ -96,7 +76,7 @@ const GifSchema = new mongoose.Schema(
   },
   { collection: 'gifs' },
 )
-  .plugin(shortid)
+  .plugin(shortId)
   .plugin(owner)
   .plugin(timestamps, { indexCreation: true })
   .plugin(comments)

@@ -1,8 +1,8 @@
 const express = require('express');
+const { Types } = require('mongoose');
 
 const { InternalServerError, BadRequest } = require('../../../error/httpStatusCodeErrors');
 const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
-const userMiddleware = require('../../../middlewares/express/user');
 
 const router = new express.Router();
 
@@ -12,11 +12,11 @@ const router = new express.Router();
  *
  * Retrieves the lists of comments for a given gif
  */
-router.get('/:id/comments', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    await req.season.populate('comments.author').execPopulate();
+    await req.gif.populate('comments.author').execPopulate();
 
-    return res.send(req.comments);
+    return res.send(req.gif.comments);
   } catch (err) {
     return res.errorHandler(new InternalServerError(err));
   }
@@ -28,18 +28,18 @@ router.get('/:id/comments', async (req, res) => {
  *
  * Adds a new comment to a given gif
  */
-router.post('/:id/comments', jwtAuthMiddleware, userMiddleware, async (req, res) => {
+router.post('/', jwtAuthMiddleware, async (req, res) => {
   try {
     if (req.body.comment) {
       req.gif.comments.push({
         text: req.body.comment,
-        author: req.user,
+        user: Types.ObjectId(req.user.id),
       });
 
-      await req.season.save();
+      await req.gif.save();
 
       const itemIndex = req.gif.comments.length - 1;
-      await req.gif.populate(`comments.${itemIndex}.author`).execPopulate();
+      await req.gif.populate(`comments.${itemIndex}.user`).execPopulate();
 
       const item = req.gif.comments[itemIndex].toJSON();
 
