@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const ratings = require('../constants/ratings');
+const shortid = require('../middlewares/mongoose/shortid');
 const owner = require('../middlewares/mongoose/owner');
 const timestamps = require('../middlewares/mongoose/timestamps');
 const comments = require('../middlewares/mongoose/comments');
@@ -90,9 +91,10 @@ const GifSchema = new mongoose.Schema(
   },
   { collection: 'gifs' },
 )
+  .plugin(shortid)
   .plugin(owner)
   .plugin(timestamps, { indexCreation: true })
   .plugin(comments)
-  .plugin(normalizeJSON);
+  .plugin(normalizeJSON, { rename: { shortId: 'id' } });
 
 module.exports = mongoose.model('Gif', GifSchema);

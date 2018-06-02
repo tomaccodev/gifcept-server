@@ -15,7 +15,7 @@ const router = new express.Router();
  */
 router.get('/:id.(gif|png)', async (req, res) => {
   try {
-    const { gifFile } = await Gif.findOne({ _id: req.params.id }).populate('gifFile');
+    const { gifFile } = await Gif.findOne({ shortId: req.params.id }).populate('gifFile');
     if (!gifFile) {
       return res.errorHandler(new NotFound());
     }
