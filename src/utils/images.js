@@ -1,16 +1,13 @@
 const { PassThrough } = require('stream');
+const { promisify } = require('util');
 const gm = require('gm');
 
 module.exports = {
-  getSize: pathToFile =>
-    new Promise((res, rej) => {
-      gm(pathToFile).size((err, size) => {
-        if (err) {
-          return rej(err);
-        }
-        return res(size);
-      });
-    }),
+  getSize: pathToFile => {
+    const image = gm(pathToFile);
+
+    return promisify(image.size.bind(image))();
+  },
   getImagePredominantHexColor: async pathToFile =>
     new Promise((res, rej) => {
       gm(pathToFile)
@@ -47,16 +44,11 @@ module.exports = {
           stdout.pipe(writeStream);
         });
     }),
-  saveFrameFromGif: (src, dest) =>
-    new Promise((res, rej) => {
-      gm(src)
-        .noProfile()
-        .selectFrame(0)
-        .write(dest, err => {
-          if (err) {
-            return rej(err);
-          }
-          return res();
-        });
-    }),
+  saveFrameFromGif: (src, dest) => {
+    const image = gm(src)
+      .noProfile()
+      .selectFrame(0);
+
+    return promisify(image.write.bind(image))(dest);
+  },
 };

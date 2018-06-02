@@ -139,7 +139,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
         user: req.user,
       });
 
-      return res.json(gif.toJSON());
+      return res.json(await serializeGif(gif));
     }
     return res.errorHandler(new BadRequest());
   } catch (err) {
