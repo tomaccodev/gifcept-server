@@ -61,6 +61,11 @@ const GifSchema = new mongoose.Schema(
       ref: 'GifFile',
       required: true,
     },
+    color: {
+      type: String,
+      required: true,
+      validate: [v => v.match(/^#[\da-f]{6}$/i), 'Invalid color'],
+    },
     description: {
       type: String,
       default: null,

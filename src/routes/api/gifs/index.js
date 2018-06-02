@@ -15,7 +15,7 @@ const { Gif, GifFile } = require('../../../models');
 const download = require('../../../utils/download');
 const { getSize } = require('../../../utils/images');
 const { getFileSize, move } = require('../../../utils/files');
-const { saveFrameFromGif } = require('../../../utils/images');
+const { saveFrameFromGif, getImagePredominantHexColor } = require('../../../utils/images');
 
 const router = new express.Router();
 
@@ -24,10 +24,11 @@ const PAGE_SIZE = 20;
 const serializeGif = async gif => {
   await gif.populate('user').execPopulate();
 
-  const { id, description, user, created, comments, views, likes, shares } = gif.toJSON();
+  const { id, color, description, user, created, comments, views, likes, shares } = gif.toJSON();
 
   return {
     id,
+    color,
     description,
     user: {
       id: user.id,
@@ -108,6 +109,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
           md5checksum,
           width,
           height,
+          color: await getImagePredominantHexColor(framePath),
           fileSize,
           frameFileSize,
           importationUrls: [
@@ -133,6 +135,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
 
       const gif = await Gif.create({
         gifFile,
+        color: gifFile.color,
         user: req.user,
       });
 
