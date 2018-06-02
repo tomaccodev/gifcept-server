@@ -12,7 +12,7 @@ const handleError = (err, res) => {
   if (isDevelopment()) {
     res.send({
       message: err.message,
-      stack: err.stack,
+      stack: ((err.originalError && err.originalError.stack) || err.stack).split('\n'),
     });
   }
   res.end();

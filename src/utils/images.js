@@ -11,9 +11,8 @@ module.exports = {
   getImagePredominantHexColor: async pathToFile =>
     new Promise((res, rej) => {
       gm(pathToFile)
-        .noProfile()
         .resize(1, 1)
-        .colors(16)
+        .colors(1)
         .stream('histogram', (err, stdout) => {
           if (err) {
             rej(err);
@@ -28,14 +27,14 @@ module.exports = {
           writeStream.on('end', () => {
             // strData contains this sample content (at least for imagemagick)
             // comment={
-            //          1: (110, 93, 74,  0)    #6E5D4A00
+            //          1: (110, 93, 74,  0)    #6E5D4A00 (or #6E5D4A)
             // }
             const startPattern = '#';
             const endPattern = '}';
             const startIndex = strData.indexOf(startPattern);
-            const endIndex = strData.indexOf(endPattern) - 3;
+            const endIndex = strData.indexOf(endPattern) - 1;
 
-            const hexColor = strData.slice(startIndex, endIndex);
+            const hexColor = strData.slice(startIndex, endIndex).slice(0, 7);
             res(hexColor);
           });
           writeStream.on('error', error => {

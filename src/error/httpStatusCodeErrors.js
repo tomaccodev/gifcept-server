@@ -14,9 +14,10 @@ const ERROR_CODES = {
  */
 const statusCodeFactory = (statusCode, message) =>
   class StatusCodeError extends Error {
-    constructor(errorMessage = message) {
-      super(errorMessage);
+    constructor(originalError) {
+      super(message);
       this.statusCode = statusCode;
+      this.originalError = originalError;
     }
   };
 
