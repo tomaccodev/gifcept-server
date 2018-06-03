@@ -1,7 +1,6 @@
 const express = require('express');
 const { Types } = require('mongoose');
 
-const { Gif } = require('../../../models');
 const { InternalServerError, BadRequest } = require('../../../error/httpStatusCodeErrors');
 const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
 
@@ -16,13 +15,9 @@ const router = new express.Router();
 router.post('/', jwtAuthMiddleware, async (req, res) => {
   try {
     // Check if the gif is already liked by current user
-    const gif = await Gif.findOne({
-      // eslint-disable-next-line no-underscore-dangle
-      _id: req.gif._id,
-      likes: { $elemMatch: { user: Types.ObjectId(req.user.id) } },
-    });
+    const like = req.gif.likes.find(l => l.user.equals(req.user.id));
 
-    if (gif) {
+    if (like) {
       return res.errorHandler(new BadRequest());
     }
 
@@ -47,17 +42,12 @@ router.post('/', jwtAuthMiddleware, async (req, res) => {
 router.delete('/', jwtAuthMiddleware, async (req, res) => {
   try {
     // Check if the gif is already liked by current user
-    const gif = await Gif.findOne({
-      // eslint-disable-next-line no-underscore-dangle
-      _id: req.gif._id,
-      likes: { $elemMatch: { user: Types.ObjectId(req.user.id) } },
-    });
+    const like = req.gif.likes.find(l => l.user.equals(req.user.id));
 
-    if (!gif) {
+    if (!like) {
       return res.errorHandler(new BadRequest());
     }
 
-    const like = gif.likes.find(l => l.user.equals(req.user.id));
     // eslint-disable-next-line no-underscore-dangle
     req.gif.likes.id(like._id).remove();
     await req.gif.save();
