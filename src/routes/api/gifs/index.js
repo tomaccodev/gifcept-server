@@ -88,60 +88,61 @@ router.get('/', async (req, res) => {
  */
 router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
   try {
-    if (req.body.url) {
-      const tempPath = path.join(config.uploadDir, `${v4()}.gif`);
+    if (!req.body.url) {
+      return res.errorHandler(new BadRequest());
+    }
 
-      const md5checksum = await download(req.body.url, tempPath);
-      let gifFile = await GifFile.findOne({ md5checksum });
+    const tempPath = path.join(config.uploadDir, `${v4()}.gif`);
 
-      if (!gifFile) {
-        const { width, height } = await getSize(tempPath);
-        const fileSize = await getFileSize(tempPath);
-        const framePath = path.join(
-          config.uploadDir,
-          `${path.basename(tempPath, path.extname(tempPath))}.png`,
-        );
+    const md5checksum = await download(req.body.url, tempPath);
+    let gifFile = await GifFile.findOne({ md5checksum });
 
-        await saveFrameFromGif(tempPath, framePath);
-        const frameFileSize = await getFileSize(framePath);
+    if (!gifFile) {
+      const { width, height } = await getSize(tempPath);
+      const fileSize = await getFileSize(tempPath);
+      const framePath = path.join(
+        config.uploadDir,
+        `${path.basename(tempPath, path.extname(tempPath))}.png`,
+      );
 
-        gifFile = await GifFile.create({
-          md5checksum,
-          width,
-          height,
-          color: await getImagePredominantHexColor(framePath),
-          fileSize,
-          frameFileSize,
-          importationUrls: [
-            {
-              url: req.body.url,
-            },
-          ],
-        });
+      await saveFrameFromGif(tempPath, framePath);
+      const frameFileSize = await getFileSize(framePath);
 
-        await Promise.all([
-          // eslint-disable-next-line no-underscore-dangle
-          move(tempPath, path.join(config.gifsDir, `${gifFile._id}.gif`)),
-          // eslint-disable-next-line no-underscore-dangle
-          move(framePath, path.join(config.gifsDir, `${gifFile._id}.png`)),
-        ]);
-      } else if (!gifFile.importationUrls.some(i => i.url === req.body.url)) {
-        gifFile.importationUrls.push({
-          url: req.body.url,
-        });
-
-        await gifFile.save();
-      }
-
-      const gif = await Gif.create({
-        gifFile,
-        color: gifFile.color,
-        user: req.user,
+      gifFile = await GifFile.create({
+        md5checksum,
+        width,
+        height,
+        color: await getImagePredominantHexColor(framePath),
+        fileSize,
+        frameFileSize,
+        importationUrls: [
+          {
+            url: req.body.url,
+          },
+        ],
       });
 
-      return res.json(await serializeGif(gif));
+      await Promise.all([
+        // eslint-disable-next-line no-underscore-dangle
+        move(tempPath, path.join(config.gifsDir, `${gifFile._id}.gif`)),
+        // eslint-disable-next-line no-underscore-dangle
+        move(framePath, path.join(config.gifsDir, `${gifFile._id}.png`)),
+      ]);
+    } else if (!gifFile.importationUrls.some(i => i.url === req.body.url)) {
+      gifFile.importationUrls.push({
+        url: req.body.url,
+      });
+
+      await gifFile.save();
     }
-    return res.errorHandler(new BadRequest());
+
+    const gif = await Gif.create({
+      gifFile,
+      color: gifFile.color,
+      user: req.user,
+    });
+
+    return res.json(await serializeGif(gif));
   } catch (err) {
     return res.errorHandler(new InternalServerError(err));
   }
