@@ -12,6 +12,12 @@
     "jwtSecret": "RANDMON STRING",
     "jwtExpiration": "30m"
   },
-  "uploadDir": "/path/to/wherever",
-  "gifsDir": "/path/to/wherever"
+  "facebook": {
+    "clientId": "FacebookAppClientId",
+    "clientSecret": "FacebookAppClientSecret"
+  },
+  "dirs": {
+    "uploadDir": "/path/to/wherever",
+    "gifsDir": "/path/to/wherever"
+  }
 }

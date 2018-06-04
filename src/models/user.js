@@ -20,12 +20,29 @@ const UserSchema = new mongoose.Schema(
       enum: Object.values(roles),
       default: roles.user,
     },
+    facebook: {
+      id: {
+        type: String,
+        index: {
+          unique: true,
+          partialFilterExpression: { 'facebook.id': { $type: 'string' } },
+        },
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+      username: {
+        type: String,
+        required: true,
+      },
+    },
   },
   { collection: 'users' },
 )
   .plugin(normalizeJSON)
   .plugin(email)
-  .plugin(password)
+  .plugin(password, { required: false })
   .plugin(timestamps);
 
 module.exports = mongoose.model('User', UserSchema);

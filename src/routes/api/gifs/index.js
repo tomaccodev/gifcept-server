@@ -92,7 +92,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
       return res.errorHandler(new BadRequest());
     }
 
-    const tempPath = path.join(config.uploadDir, `${v4()}.gif`);
+    const tempPath = path.join(config.dirs.uploadDir, `${v4()}.gif`);
 
     const md5checksum = await download(req.body.url, tempPath);
     let gifFile = await GifFile.findOne({ md5checksum });
@@ -101,7 +101,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
       const { width, height } = await getSize(tempPath);
       const fileSize = await getFileSize(tempPath);
       const framePath = path.join(
-        config.uploadDir,
+        config.dris.uploadDir,
         `${path.basename(tempPath, path.extname(tempPath))}.png`,
       );
 
@@ -124,9 +124,9 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
 
       await Promise.all([
         // eslint-disable-next-line no-underscore-dangle
-        move(tempPath, path.join(config.gifsDir, `${gifFile._id}.gif`)),
+        move(tempPath, path.join(config.dris.gifsDir, `${gifFile._id}.gif`)),
         // eslint-disable-next-line no-underscore-dangle
-        move(framePath, path.join(config.gifsDir, `${gifFile._id}.png`)),
+        move(framePath, path.join(config.dirs.gifsDir, `${gifFile._id}.png`)),
       ]);
     } else if (!gifFile.importationUrls.some(i => i.url === req.body.url)) {
       gifFile.importationUrls.push({

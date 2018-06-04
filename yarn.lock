@@ -3811,6 +3811,10 @@ oauth-sign@~0.8.2:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.8.2.tgz#46a6ab7f0aead8deae9ec0565780b7d4efeb9d43"
 
+oauth@0.9.x:
+  version "0.9.15"
+  resolved "https://registry.yarnpkg.com/oauth/-/oauth-0.9.15.tgz#bd1fefaf686c96b75475aed5196412ff60cfb9c1"
+
 object-assign@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-3.0.0.tgz#9bedd5ca0897949bca47e7ff408062d549f587f2"
@@ -4047,12 +4051,42 @@ pascalcase@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/pascalcase/-/pascalcase-0.1.1.tgz#b363e55e8006ca6fe21784d2db22bd15d7917f14"
 
+passport-facebook-token@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/passport-facebook-token/-/passport-facebook-token-3.3.0.tgz#7404ca6fdd3790e11060cc60c562b21f0d0481ee"
+  dependencies:
+    passport-oauth "1.0.0"
+
 passport-jwt@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/passport-jwt/-/passport-jwt-4.0.0.tgz#7f0be7ba942e28b9f5d22c2ebbb8ce96ef7cf065"
   dependencies:
     jsonwebtoken "^8.2.0"
     passport-strategy "^1.0.0"
+
+passport-oauth1@1.x.x:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/passport-oauth1/-/passport-oauth1-1.1.0.tgz#a7de988a211f9cf4687377130ea74df32730c918"
+  dependencies:
+    oauth "0.9.x"
+    passport-strategy "1.x.x"
+    utils-merge "1.x.x"
+
+passport-oauth2@1.x.x:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/passport-oauth2/-/passport-oauth2-1.4.0.tgz#f62f81583cbe12609be7ce6f160b9395a27b86ad"
+  dependencies:
+    oauth "0.9.x"
+    passport-strategy "1.x.x"
+    uid2 "0.0.x"
+    utils-merge "1.x.x"
+
+passport-oauth@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/passport-oauth/-/passport-oauth-1.0.0.tgz#90aff63387540f02089af28cdad39ea7f80d77df"
+  dependencies:
+    passport-oauth1 "1.x.x"
+    passport-oauth2 "1.x.x"
 
 passport-strategy@1.x.x, passport-strategy@^1.0.0:
   version "1.0.0"
@@ -5199,6 +5233,10 @@ uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
 
+uid2@0.0.x:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/uid2/-/uid2-0.0.3.tgz#483126e11774df2f71b8b639dcd799c376162b82"
+
 unc-path-regex@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/unc-path-regex/-/unc-path-regex-0.1.2.tgz#e73dd3d7b0d7c5ed86fbac6b0ae7d8c6a69d50fa"
@@ -5273,7 +5311,7 @@ util.promisify@^1.0.0:
     define-properties "^1.1.2"
     object.getownpropertydescriptors "^2.0.3"
 
-utils-merge@1.0.1:
+utils-merge@1.0.1, utils-merge@1.x.x:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
 

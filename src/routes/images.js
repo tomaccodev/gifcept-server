@@ -28,7 +28,7 @@ router.get('/:id.(gif|png)', async (req, res) => {
     }
 
     // eslint-disable-next-line no-underscore-dangle
-    return res.sendFile(path.join(config.gifsDir, `${gif.gifFile._id}${extension}`));
+    return res.sendFile(path.join(config.dirs.gifsDir, `${gif.gifFile._id}${extension}`));
   } catch (err) {
     return res.errorHandler(err);
   }
