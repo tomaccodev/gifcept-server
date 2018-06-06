@@ -101,7 +101,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
       const { width, height } = await getSize(tempPath);
       const fileSize = await getFileSize(tempPath);
       const framePath = path.join(
-        config.dris.uploadDir,
+        config.dirs.uploadDir,
         `${path.basename(tempPath, path.extname(tempPath))}.png`,
       );
 
@@ -124,7 +124,7 @@ router.post('/', jwtAuthMiddleware, userMiddleware, async (req, res) => {
 
       await Promise.all([
         // eslint-disable-next-line no-underscore-dangle
-        move(tempPath, path.join(config.dris.gifsDir, `${gifFile._id}.gif`)),
+        move(tempPath, path.join(config.dirs.gifsDir, `${gifFile._id}.gif`)),
         // eslint-disable-next-line no-underscore-dangle
         move(framePath, path.join(config.dirs.gifsDir, `${gifFile._id}.png`)),
       ]);

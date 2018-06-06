@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema(
       default: roles.user,
     },
     facebook: {
+      // TODO add validator so that if facebook is provided it contains all the fields
       id: {
         type: String,
         index: {
@@ -30,11 +31,9 @@ const UserSchema = new mongoose.Schema(
       },
       email: {
         type: String,
-        required: true,
       },
       username: {
         type: String,
-        required: true,
       },
     },
   },
