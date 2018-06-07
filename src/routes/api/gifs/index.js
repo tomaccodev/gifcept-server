@@ -70,7 +70,8 @@ router.param('id', async (req, res, next, id) => {
  */
 router.get('/', async (req, res) => {
   try {
-    const gifs = await Gif.find({})
+    const query = req.query.before ? { created: { $lt: req.query.before } } : {};
+    const gifs = await Gif.find(query)
       .limit(PAGE_SIZE)
       .sort({ created: -1 });
 
