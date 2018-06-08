@@ -41,6 +41,11 @@ const createServerAsync = async () => {
     // Register image retrieval routes
     app.use('/', images);
 
+    // Serve public/index.html
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    });
+
     // Register custom error handler (should registered last be last)
     app.use(errorHandler);
 

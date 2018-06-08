@@ -6,7 +6,7 @@ const { v4 } = require('uuid');
 
 const { User, GifFile, Gif } = require('../models');
 const config = require('../config');
-const { move } = require('../utils/files');
+const { copy } = require('../utils/files');
 const { getImagePredominantHexColor } = require('../utils/images');
 const { saveFrameFromGif } = require('../utils/images');
 
@@ -59,7 +59,7 @@ const importGifFile = async mysqlGif => {
 
   const gifPath = path.join(config.dirs.importSource, `${mysqlGif.sguid}.gif`);
 
-  const framePath = path.join(config.dirs.importSource, `${mysqlGif.sguid}.png`);
+  const framePath = path.join(config.dirs.importSource, `${mysqlGif.sguid}.jpg`);
 
   try {
     await saveFrameFromGif(gifPath, framePath);
@@ -94,9 +94,9 @@ const importGifFile = async mysqlGif => {
 
     await Promise.all([
       // eslint-disable-next-line no-underscore-dangle
-      move(gifPath, path.join(config.dirs.gifsDir, `${createdGif._id}.gif`)),
+      copy(gifPath, path.join(config.dirs.gifsDir, `${createdGif._id}.gif`)),
       // eslint-disable-next-line no-underscore-dangle
-      move(framePath, path.join(config.dirs.gifsDir, `${createdGif._id}.png`)),
+      copy(framePath, path.join(config.dirs.gifsDir, `${createdGif._id}.jpg`)),
     ]);
   } catch (e) {
     // eslint-disable-next-line no-console

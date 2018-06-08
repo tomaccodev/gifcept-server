@@ -13,7 +13,7 @@ const router = new express.Router();
  *
  * Retrieves an image
  */
-router.get('/:id.(gif|png)', async (req, res) => {
+router.get('/:id.(gif|jpg)', async (req, res) => {
   try {
     const gif = await Gif.findOne({ shortId: req.params.id }).populate('gifFile');
     if (!gif) {
