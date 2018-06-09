@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 
 const { NotFound } = require('../error/httpStatusCodeErrors');
@@ -8,27 +7,23 @@ const config = require('../config');
 const router = new express.Router();
 
 /**
- * Route: /:id.gif & /:id.jpg
+ * Route: /:id
  * Method: GET
  *
- * Retrieves an image
+ * Retrieves a gif page
  */
-router.get('/:id.(gif|jpg)', async (req, res) => {
+router.get('/:id([\\d\\w]{7,12})', async (req, res) => {
   try {
     const gif = await Gif.findOne({ shortId: req.params.id }).populate('gifFile');
     if (!gif) {
       return res.errorHandler(new NotFound());
     }
 
-    const extension = path.extname(req.path);
-
-    if (extension === '.gif') {
-      gif.views += 1;
-      await gif.save();
-    }
-
-    // eslint-disable-next-line no-underscore-dangle
-    return res.sendFile(path.join(config.dirs.gifsDir, `${gif.gifFile._id}${extension}`));
+    return res.render('gif', {
+      baseUrl: config.baseUrl,
+      facebookId: config.facebook.clientId,
+      gif,
+    });
   } catch (err) {
     return res.errorHandler(err);
   }

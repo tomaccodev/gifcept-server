@@ -4,6 +4,7 @@ const os = require('os');
 const express = require('express');
 const morgan = require('morgan');
 const passport = require('passport');
+const ect = require('ect')();
 
 const config = require('./config.json');
 const connectMongoose = require('./helpers/mongoose');
@@ -11,6 +12,7 @@ const { setEnvironment } = require('./helpers/env');
 const { errorHandler, responseErrorHandler } = require('./middlewares/express/errorHandler');
 const api = require('./routes/api');
 const images = require('./routes/images');
+const gifPages = require('./routes/gifPages');
 
 setEnvironment(config.environment);
 
@@ -19,6 +21,9 @@ const PORT = config.server.port;
 const createServerAsync = async () => {
   try {
     const app = express();
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'ect');
+    app.engine('ect', ect.render);
 
     // Initialize passport
     app.use(passport.initialize());
@@ -40,6 +45,9 @@ const createServerAsync = async () => {
 
     // Register image retrieval routes
     app.use('/', images);
+
+    // Register gif page routes
+    app.use('/', gifPages);
 
     // Serve public/index.html
     app.get('*', (req, res) => {
