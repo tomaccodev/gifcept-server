@@ -19,7 +19,7 @@ const { saveFrameFromGif, getImagePredominantHexColor } = require('../../../util
 
 const router = new express.Router();
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = config.pageSizes.gifs;
 
 const serializeGif = async gif => {
   await gif.populate('user').execPopulate();
@@ -82,10 +82,31 @@ router.param('id', async (req, res, next, id) => {
  */
 router.get('/', async (req, res) => {
   try {
-    const query = req.query.before ? { created: { $lt: req.query.before } } : {};
-    const gifs = await Gif.find(query)
-      .limit(PAGE_SIZE)
-      .sort({ created: -1 });
+    const query = {};
+    if (req.query.before) {
+      query.created = { $lt: req.query.before };
+    }
+
+    const gifsPromise = Gif.find(query);
+
+    if (req.query.search) {
+      gifsPromise.or([
+        {
+          description: {
+            $regex: req.query.search,
+            $options: 'i',
+          },
+        },
+        {
+          tags: {
+            $regex: req.query.search,
+            $options: 'i',
+          },
+        },
+      ]);
+    }
+
+    const gifs = await gifsPromise.limit(PAGE_SIZE).sort({ created: -1 });
 
     return res.send(await Promise.all(gifs.map(serializeGif)));
   } catch (err) {

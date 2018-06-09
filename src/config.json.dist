@@ -26,5 +26,9 @@
     "uploadDir": "/path/to/wherever",
     "gifsDir": "/path/to/wherever",
     "importSource": "/path/to/wherever"
+  },
+  "pageSizes": {
+    "gifs": 30,
+    "tags": 20
   }
 }
