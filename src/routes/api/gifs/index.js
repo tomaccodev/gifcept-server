@@ -24,7 +24,18 @@ const PAGE_SIZE = 20;
 const serializeGif = async gif => {
   await gif.populate('user').execPopulate();
 
-  const { id, color, description, user, created, comments, views, likes, shares } = gif.toJSON();
+  const {
+    id,
+    color,
+    description,
+    user,
+    created,
+    comments,
+    views,
+    likes,
+    shares,
+    tags,
+  } = gif.toJSON();
 
   return {
     id,
@@ -42,6 +53,7 @@ const serializeGif = async gif => {
     shares: [],
     sharesCount: shares.length,
     viewsCount: views,
+    tags,
   };
 };
 

@@ -122,7 +122,18 @@ const importGif = async mysqlGif => {
     WHERE user_gif_comments.user_gif_id=${mysqlGif.id}
   `);
 
-  const [[likes], [comments]] = await Promise.all([likesPromise, commentsPromise]);
+  const tagsPromise = query(`
+    SELECT user_tags.name
+    FROM user_tags, user_gif_tags
+    WHERE user_gif_tags.user_tag_id = user_tags.id
+      AND user_gif_tags.user_gif_id=${mysqlGif.id}
+  `);
+
+  const [[likes], [comments], [tags]] = await Promise.all([
+    likesPromise,
+    commentsPromise,
+    tagsPromise,
+  ]);
 
   await Gif.create({
     gifFile: gifFiles[mysqlGif.gif_id],
@@ -144,6 +155,7 @@ const importGif = async mysqlGif => {
       created: `${c.created_at}Z`,
       updated: c.created_at !== c.updated_at ? `${c.updated_at}Z` : null,
     })),
+    tags: tags.map(t => t.name),
   }).then(createdGif => {
     gifs[mysqlGif.id] = createdGif;
   });

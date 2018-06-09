@@ -7,20 +7,6 @@ const timestamps = require('../middlewares/mongoose/timestamps');
 const comments = require('../middlewares/mongoose/comments');
 const normalizeJSON = require('../middlewares/mongoose/normalizeJSON');
 
-const TagSchema = new mongoose.Schema({
-  tag: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tag',
-    required: true,
-    index: true,
-  },
-  name: {
-    type: String,
-    required: true,
-    index: true,
-  },
-}).plugin(timestamps, { update: false });
-
 const LikeSchema = new mongoose.Schema({}).plugin(owner).plugin(timestamps, { update: false });
 
 const ShareSchema = new mongoose.Schema({
@@ -62,7 +48,7 @@ const GifSchema = new mongoose.Schema(
       default: 0,
     },
     tags: {
-      type: [TagSchema],
+      type: [String],
       default: [],
     },
     likes: {

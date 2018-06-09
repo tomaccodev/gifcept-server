@@ -38,3 +38,4 @@ config.json
 # Uploaded assets
 /gifs
 /upload
+/src/public
