@@ -27,6 +27,14 @@ const GifSchema = new mongoose.Schema(
       ref: 'GifFile',
       required: true,
     },
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
+    },
     color: {
       type: String,
       required: true,

@@ -11,9 +11,9 @@
     <meta property="og:site_name" content="Gifcept" />
     <meta property="og:url" content="<%= @baseUrl %>/<%= @gif.shortId %>.gif" />
     <meta property="og:title" content="Gifcept, <%= @gif.description %>" />
-    <meta property="og:description" content="Gifcept, <%= @gif.description %>" />
+    <meta property="og:description" content="<%= @gif.description %>" />
 
-    <meta property="og:image" content="<%= @baseUrl %>/<%= @gif.shortId %>.jpg" />
+    <meta property="og:image" content="<%= @baseUrl %>/<%= @gif.shortId %>.gif" />
     <meta property="og:image:type" content="image/gif" />
     <meta property="og:image:width" content="<%= @gif.width %>" />
     <meta property="og:image:height" content="<%= @gif.height %>" />

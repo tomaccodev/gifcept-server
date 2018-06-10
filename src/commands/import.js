@@ -140,6 +140,8 @@ const importGif = async mysqlGif => {
     user: users[mysqlGif.user_id],
     shortId: mysqlGif.sguid,
     description: mysqlGif.description,
+    width: gifFiles[mysqlGif.gif_id].width,
+    height: gifFiles[mysqlGif.gif_id].height,
     color: gifFiles[mysqlGif.gif_id].color,
     rating: mysqlGif.user_rating,
     views: mysqlGif.views,
