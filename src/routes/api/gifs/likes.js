@@ -24,6 +24,7 @@ router.post('/', jwtAuthMiddleware, async (req, res) => {
     req.gif.likes.push({
       user: Types.ObjectId(req.user.id),
     });
+    req.gif.likesCount = req.gif.likes.length;
 
     await req.gif.save();
 
@@ -50,6 +51,7 @@ router.delete('/', jwtAuthMiddleware, async (req, res) => {
 
     // eslint-disable-next-line no-underscore-dangle
     req.gif.likes.id(like._id).remove();
+    req.gif.likesCount = req.gif.likes.length;
     await req.gif.save();
 
     return res.send();

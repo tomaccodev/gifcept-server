@@ -61,6 +61,7 @@ router.post('/', jwtAuthMiddleware, async (req, res) => {
       user: Types.ObjectId(req.user.id),
     });
 
+    req.gif.commentsCount = req.gif.comments.length;
     await req.gif.save();
 
     const commentIndex = req.gif.comments.length - 1;
@@ -93,6 +94,7 @@ router.delete('/:id', jwtAuthMiddleware, async (req, res) => {
     }
 
     comment.remove();
+    req.gif.commentsCount = req.gif.comments.length;
     await req.gif.save();
 
     return res.send();

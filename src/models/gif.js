@@ -51,9 +51,10 @@ const GifSchema = new mongoose.Schema(
       enum: Object.keys(ratings).map(roleKey => ratings[roleKey]),
       index: true,
     },
-    views: {
+    viewsCount: {
       type: Number,
       default: 0,
+      index: true,
     },
     tags: {
       type: [String],
@@ -63,9 +64,24 @@ const GifSchema = new mongoose.Schema(
       type: [LikeSchema],
       default: [],
     },
+    likesCount: {
+      type: Number,
+      default: 0,
+      index: true,
+    },
     shares: {
       type: [ShareSchema],
       default: [],
+    },
+    sharesCount: {
+      type: Number,
+      default: 0,
+      index: true,
+    },
+    commentsCount: {
+      type: Number,
+      default: 0,
+      index: true,
     },
   },
   { collection: 'gifs' },

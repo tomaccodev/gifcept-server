@@ -151,12 +151,14 @@ const importGif = async mysqlGif => {
       user: users[l.user_id],
       created: `${l.created_at}Z`,
     })),
+    likesCount: likes.length,
     comments: comments.map(c => ({
       user: users[c.user_id],
       text: c.comment,
       created: `${c.created_at}Z`,
       updated: c.created_at !== c.updated_at ? `${c.updated_at}Z` : null,
     })),
+    commentsCount: comments.length,
     tags: tags.map(t => t.name),
   }).then(createdGif => {
     gifs[mysqlGif.id] = createdGif;

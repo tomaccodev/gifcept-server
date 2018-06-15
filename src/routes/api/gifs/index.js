@@ -30,10 +30,10 @@ const serializeGif = async gif => {
     description,
     user,
     created,
-    comments,
-    views,
-    likes,
-    shares,
+    commentsCount,
+    viewsCount,
+    likesCount,
+    sharesCount,
     tags,
   } = gif.toJSON();
 
@@ -47,12 +47,12 @@ const serializeGif = async gif => {
     },
     created,
     comments: [],
-    commentsCount: comments.length,
+    commentsCount,
     likes: [],
-    likesCount: likes.length,
+    likesCount,
     shares: [],
-    sharesCount: shares.length,
-    viewsCount: views,
+    sharesCount,
+    viewsCount,
     tags,
   };
 };
@@ -87,6 +87,10 @@ router.get('/', async (req, res) => {
       query.created = { $lt: req.query.before };
     }
 
+    if (req.query.user) {
+      query.user = req.query.user;
+    }
+
     const gifsPromise = Gif.find(query);
 
     if (req.query.search) {
@@ -106,7 +110,12 @@ router.get('/', async (req, res) => {
       ]);
     }
 
-    const gifs = await gifsPromise.limit(PAGE_SIZE).sort({ created: -1 });
+    let sort = { created: -1 };
+    if (req.query.sort === 'likes') {
+      sort = { likesCount: -1 };
+    }
+
+    const gifs = await gifsPromise.limit(PAGE_SIZE).sort(sort);
 
     return res.send(await Promise.all(gifs.map(serializeGif)));
   } catch (err) {
