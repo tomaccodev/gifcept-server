@@ -1,43 +1,26 @@
-const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
 
-const { gifQueryMetadataFromRequest } = require('../../../utils/search');
-const { NotFound, InternalServerError } = require('../../../error/httpStatusCodeErrors');
-const { Gif } = require('../../../models');
+const { User } = require('../../../models');
+const { NotFound } = require('../../../error/httpStatusCodeErrors');
 
 const router = new express.Router();
 
 router.param('id', async (req, res, next, id) => {
   try {
-    const gif = await Gif.findOne({
-      shortId: id,
+    const user = await User.findOne({
+      _id: id,
     });
 
-    if (!gif) {
+    if (!user) {
       return res.errorHandler(new NotFound());
     }
 
-    req.gif = gif;
+    req.user = user;
     return next();
   } catch (err) {
     return res.errorHandler(err);
-  }
-});
-
-/**
- * Route: /api/gifs
- * Method: GET
- *
- * Retrieves a list of gifs
- */
-router.get('/', async (req, res) => {
-  try {
-    const gifs = await Gif.normalizedQuery(gifQueryMetadataFromRequest(req));
-
-    return res.send(await Promise.all(gifs.map(g => g.serialize())));
-  } catch (err) {
-    return res.errorHandler(new InternalServerError(err));
   }
 });
 

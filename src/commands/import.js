@@ -1,9 +1,9 @@
-/* eslint-disable function-paren-newline */
-const connectMongoose = require('../helpers/mongoose');
+/* eslint-disable function-paren-newline, implicit-arrow-linebreak */
 const path = require('path');
 const mysql = require('mysql2/promise');
 const { v4 } = require('uuid');
 
+const connectMongoose = require('../helpers/mongoose');
 const { User, GifFile, Gif } = require('../models');
 const config = require('../config');
 const { copy } = require('../utils/files');

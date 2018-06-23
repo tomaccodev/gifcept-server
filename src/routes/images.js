@@ -23,7 +23,7 @@ router.get('/:id.(gif|jpg)', async (req, res) => {
     const extension = path.extname(req.path);
 
     if (extension === '.gif') {
-      gif.views += 1;
+      gif.viewsCount += 1;
       await gif.save();
     }
 
