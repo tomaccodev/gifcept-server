@@ -16,7 +16,7 @@ module.exports = {
 
     return {
       criteria,
-      sort: req.query && req.query.sort,
+      order: req.query && req.query.order,
     };
   },
 };
