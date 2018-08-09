@@ -12,7 +12,10 @@ const MONGODB_URI = `mongodb://${config.mongodb.host}:${config.mongodb.port}/${
 
 module.exports = () => {
   if (connectionPromise === null) {
-    connectionPromise = mongoose.connect(MONGODB_URI);
+    connectionPromise = mongoose.connect(
+      MONGODB_URI,
+      { useNewUrlParser: true },
+    );
   }
 
   return connectionPromise;
