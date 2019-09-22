@@ -1,12 +1,18 @@
-const express = require('express');
+const { Router } = require('express');
+
+const {
+  Unauthorized,
+  InternalServerError,
+} = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+const {
+  middleware: facebookAuthMiddleware,
+} = require('@danilupion/server-utils/middlewares/express/facebook-auth');
 
 const { generateToken } = require('../../../utils/tokens');
 const roles = require('../../../constants/userRoles');
-const { Unauthorized, InternalServerError } = require('../../../error/httpStatusCodeErrors');
 const { User } = require('../../../models');
-const facebookAuthMiddleware = require('../../../middlewares/express/facebook-auth');
 
-const router = new express.Router();
+const router = new Router();
 
 router.post('/', facebookAuthMiddleware, async (req, res) => {
   try {

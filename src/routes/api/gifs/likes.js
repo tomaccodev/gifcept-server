@@ -1,10 +1,15 @@
-const express = require('express');
+const { Router } = require('express');
 const { Types } = require('mongoose');
 
-const { InternalServerError, BadRequest } = require('../../../error/httpStatusCodeErrors');
-const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
+const {
+  InternalServerError,
+  BadRequest,
+} = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+const {
+  middleware: jwtAuthMiddleware,
+} = require('@danilupion/server-utils/middlewares/express/jwt-auth');
 
-const router = new express.Router();
+const router = new Router();
 
 /**
  * Route: /api/gifs/:id/likes

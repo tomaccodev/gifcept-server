@@ -4,6 +4,7 @@
   "server":{
     "port": 3002
   },
+  "clustered": true,
   "mongodb": {
     "host": "localhost",
     "port": 27017,

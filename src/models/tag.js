@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const timestamps = require('../middlewares/mongoose/timestamps');
+const timestamps = require('@danilupion/server-utils/middlewares/mongoose/timestamps');
 
 const TagSchema = new mongoose.Schema(
   {

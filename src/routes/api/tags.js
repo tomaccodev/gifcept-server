@@ -1,8 +1,8 @@
-const express = require('express');
+const { Router } = require('express');
 
 const { Tag } = require('../../models');
 
-const router = new express.Router();
+const router = new Router();
 
 const PAGE_SIZE = 20;
 

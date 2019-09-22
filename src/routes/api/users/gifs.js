@@ -2,10 +2,16 @@ const express = require('express');
 const path = require('path');
 const { v4 } = require('uuid');
 
+const {
+  InternalServerError,
+  BadRequest,
+} = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+const {
+  middleware: jwtAuthMiddleware,
+} = require('@danilupion/server-utils/middlewares/express/jwt-auth');
+
 const config = require('../../../config');
 const { gifQueryMetadataFromRequest } = require('../../../utils/search');
-const { InternalServerError, BadRequest } = require('../../../error/httpStatusCodeErrors');
-const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
 const userMiddleware = require('../../../middlewares/express/user');
 const { Gif, GifFile } = require('../../../models');
 const download = require('../../../utils/download');

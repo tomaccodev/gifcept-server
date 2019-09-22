@@ -1,8 +1,11 @@
 /* eslint-disable no-console */
-const roles = require('../constants/userRoles');
+const mongoose = require('mongoose');
 
-const connectMongoose = require('../helpers/mongoose');
+const connectMongoose = require('@danilupion/server-utils/helpers/mongoose');
+
+const roles = require('../constants/userRoles');
 const { User } = require('../models');
+const config = require('../config');
 
 const USERS = [
   {
@@ -50,7 +53,7 @@ const createUsersAsync = async () => {
 
 const seedDatabaseAsync = async () => {
   try {
-    await connectMongoose();
+    await connectMongoose(mongoose.connect, config.mongodb);
 
     await Promise.all([createUsersAsync()]);
   } catch (err) {

@@ -1,10 +1,11 @@
-const express = require('express');
+const { Router } = require('express');
 
-const { NotFound } = require('../error/httpStatusCodeErrors');
+const { NotFound } = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+
 const { Gif } = require('../models');
 const config = require('../config');
 
-const router = new express.Router();
+const router = new Router();
 
 /**
  * Route: /:id

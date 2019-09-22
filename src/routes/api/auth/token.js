@@ -1,15 +1,15 @@
-const express = require('express');
-
-const { generateToken } = require('../../../utils/tokens');
+const { Router } = require('express');
 
 const {
   Unauthorized,
   BadRequest,
   InternalServerError,
-} = require('../../../error/httpStatusCodeErrors');
+} = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+
+const { generateToken } = require('../../../utils/tokens');
 const { User } = require('../../../models');
 
-const router = new express.Router();
+const router = new Router();
 
 /**
  * Route: /api/auth/token

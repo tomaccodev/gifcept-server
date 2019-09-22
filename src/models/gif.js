@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 
+const shortId = require('@danilupion/server-utils/middlewares/mongoose/shortId');
+const owner = require('@danilupion/server-utils/middlewares/mongoose/owner');
+const timestamps = require('@danilupion/server-utils/middlewares/mongoose/timestamps');
+const comments = require('@danilupion/server-utils/middlewares/mongoose/comments');
+const normalizeJSON = require('@danilupion/server-utils/middlewares/mongoose/normalizeJSON');
+
 const ratings = require('../constants/ratings');
 const config = require('../config');
-const shortId = require('../middlewares/mongoose/shortId');
-const owner = require('../middlewares/mongoose/owner');
-const timestamps = require('../middlewares/mongoose/timestamps');
-const comments = require('../middlewares/mongoose/comments');
-const normalizeJSON = require('../middlewares/mongoose/normalizeJSON');
 const gifOrder = require('../constants/gifOrder');
 
 const LikeSchema = new mongoose.Schema({}).plugin(owner).plugin(timestamps, { update: false });

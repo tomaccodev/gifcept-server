@@ -1,16 +1,19 @@
-const express = require('express');
+const { Router } = require('express');
 const { Types } = require('mongoose');
 
-const { User } = require('../../../models');
 const {
   InternalServerError,
   BadRequest,
   NotFound,
   Unauthorized,
-} = require('../../../error/httpStatusCodeErrors');
-const jwtAuthMiddleware = require('../../../middlewares/express/jwt-auth');
+} = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+const {
+  middleware: jwtAuthMiddleware,
+} = require('@danilupion/server-utils/middlewares/express/jwt-auth');
 
-const router = new express.Router();
+const { User } = require('../../../models');
+
+const router = new Router();
 
 const serializeComment = async comment => {
   const user = await User.findOne({ _id: comment.user });

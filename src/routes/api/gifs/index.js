@@ -1,12 +1,15 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const { Router } = require('express');
+
+const {
+  NotFound,
+  InternalServerError,
+} = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+const filesToRoutes = require('@danilupion/server-utils/routes/filesToRoutes');
+
+const router = new Router();
 
 const { gifQueryMetadataFromRequest } = require('../../../utils/search');
-const { NotFound, InternalServerError } = require('../../../error/httpStatusCodeErrors');
 const { Gif } = require('../../../models');
-
-const router = new express.Router();
 
 router.param('id', async (req, res, next, id) => {
   try {
@@ -41,19 +44,14 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Loop over files in this folder
-fs.readdirSync(__dirname).forEach(file => {
-  const fileName = path.basename(file, path.extname(file));
-  const filePath = path.join(__dirname, file);
+filesToRoutes(__dirname, {
+  router,
+  basePath: '/:id/',
+});
 
-  // Skip index.js
-  if (__filename === filePath) {
-    return;
-  }
-
-  // Register route with the same name as the file
-  // eslint-disable-next-line import/no-dynamic-require, global-require
-  router.use(`/:id/${fileName}`, require(`./${fileName}`));
+// Return 404 for the rest of the routes
+router.use('*', (req, res) => {
+  res.status(404).end();
 });
 
 module.exports = router;

@@ -1,17 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
+const { Router } = require('express');
+
+const { NotFound } = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+const filesToRoutes = require('@danilupion/server-utils/routes/filesToRoutes');
 
 const { User } = require('../../../models');
-const { NotFound } = require('../../../error/httpStatusCodeErrors');
 
-const router = new express.Router();
+const router = new Router();
 
 router.param('id', async (req, res, next, id) => {
   try {
-    const user = await User.findOne({
-      _id: id,
-    });
+    console.log(id);
+    const user = await User.findById(id);
 
     if (!user) {
       return res.errorHandler(new NotFound());
@@ -24,19 +23,9 @@ router.param('id', async (req, res, next, id) => {
   }
 });
 
-// Loop over files in this folder
-fs.readdirSync(__dirname).forEach(file => {
-  const fileName = path.basename(file, path.extname(file));
-  const filePath = path.join(__dirname, file);
-
-  // Skip index.js
-  if (__filename === filePath) {
-    return;
-  }
-
-  // Register route with the same name as the file
-  // eslint-disable-next-line import/no-dynamic-require, global-require
-  router.use(`/:id/${fileName}`, require(`./${fileName}`));
+filesToRoutes(__dirname, {
+  router,
+  basePath: '/:id/',
 });
 
 module.exports = router;

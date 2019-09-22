@@ -2,8 +2,10 @@
 const path = require('path');
 const mysql = require('mysql2/promise');
 const { v4 } = require('uuid');
+const mongoose = require('mongoose');
 
-const connectMongoose = require('../helpers/mongoose');
+const connectMongoose = require('@danilupion/server-utils/helpers/mongoose');
+
 const { User, GifFile, Gif } = require('../models');
 const config = require('../config');
 const { copy } = require('../utils/files');
@@ -77,7 +79,7 @@ const importGifFile = async mysqlGif => {
     if (!color) {
       color = defaultColor;
       // eslint-disable-next-line no-console
-      console.log(`Could was falsy for gif ${gifPath}`);
+      console.log(`Color was falsy for gif ${gifPath}`);
     }
 
     const createdGif = await GifFile.create({
@@ -225,7 +227,10 @@ const importGifs = async () => {
 };
 
 const importData = async () => {
-  [mysqlConnection] = await Promise.all([connectMysql(), connectMongoose()]);
+  [mysqlConnection] = await Promise.all([
+    connectMysql(),
+    connectMongoose(mongoose.connect, config.mongodb),
+  ]);
   await removeData();
   await Promise.all([importUsers(), importGifFiles()]);
   await importGifs();

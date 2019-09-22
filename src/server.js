@@ -2,14 +2,24 @@ const path = require('path');
 const cluster = require('cluster');
 const os = require('os');
 const express = require('express');
+const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
+
+const errorHandlerFactory = require('@danilupion/server-utils/middlewares/express/errorHandler');
+const {
+  setup: facebookAuthMiddlewareSetup,
+} = require('@danilupion/server-utils/middlewares/express/facebook-auth');
+const {
+  setup: jwtAuthMiddlewareSetup,
+} = require('@danilupion/server-utils/middlewares/express/jwt-auth');
+const connectMongoose = require('@danilupion/server-utils/helpers/mongoose');
+const { setEnvironment, isDevelopment } = require('@danilupion/server-utils/helpers/env');
+
 const ect = require('ect')();
 
 const config = require('./config.json');
-const connectMongoose = require('./helpers/mongoose');
-const { setEnvironment } = require('./helpers/env');
-const { errorHandler, responseErrorHandler } = require('./middlewares/express/errorHandler');
+
 const api = require('./routes/api');
 const images = require('./routes/images');
 const gifPages = require('./routes/gifPages');
@@ -17,6 +27,9 @@ const gifPages = require('./routes/gifPages');
 setEnvironment(config.environment);
 
 const PORT = config.server.port;
+const CLUSTERED = config.clustered;
+
+const { errorHandler, responseErrorHandler } = errorHandlerFactory(isDevelopment());
 
 const createServerAsync = async () => {
   try {
@@ -27,6 +40,14 @@ const createServerAsync = async () => {
 
     // Initialize passport
     app.use(passport.initialize());
+
+    facebookAuthMiddlewareSetup({
+      clientId: config.facebook.clientId,
+      clientSecret: config.facebook.clientSecret,
+    });
+    jwtAuthMiddlewareSetup({
+      jwtSecret: config.authentication.jwtSecret,
+    });
 
     // Configure body parser to accept json
     app.use(express.json());
@@ -57,7 +78,7 @@ const createServerAsync = async () => {
     // Register custom error handler (should registered last be last)
     app.use(errorHandler);
 
-    await connectMongoose();
+    await connectMongoose(mongoose.connect, config.mongodb);
     app.listen(PORT);
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -65,13 +86,13 @@ const createServerAsync = async () => {
   }
 };
 
-if (cluster.isMaster) {
+if (CLUSTERED && cluster.isMaster) {
   // Create a worker for each CPU
   for (let i = 0; i < os.cpus().length; i += 1) {
     cluster.fork();
   }
 } else {
-  createServerAsync();
+  createServerAsync().catch(e => console.log('Error while creating the server', e));
 }
 
 process.on('unhandledRejection', (reason, p) => {

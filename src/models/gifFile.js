@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
+const timestamps = require('@danilupion/server-utils/middlewares/mongoose/timestamps');
+
 const ratings = require('../constants/ratings');
-const timestamps = require('../middlewares/mongoose/timestamps');
 
 const ImportationUrlSchema = new mongoose.Schema(
   {

@@ -1,5 +1,6 @@
+const { Unauthorized } = require('@danilupion/server-utils/error/httpStatusCodeErrors');
+
 const { User } = require('../../models');
-const { Unauthorized } = require('../../error/httpStatusCodeErrors');
 
 /**
  * Middleware that replaces user from jwt with user from database
