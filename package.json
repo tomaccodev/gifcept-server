@@ -14,6 +14,7 @@
     "start-watch": "gulp watch",
     "seed": "node src/commands/seed.js",
     "import": "node src/commands/import.js",
+    "users": "node src/commands/users.js",
     "pretty": "prettier --write",
     "pretty-all": "yarn pretty \"{src,__tests__}/**/*.js\"",
     "lint": "eslint",
@@ -37,7 +38,7 @@
     "@danilupion/server-utils": "^0.2.0",
     "bcrypt": "^3.0.6",
     "ect": "^0.5.9",
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "gm": "^1.23.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.1",
@@ -47,18 +48,19 @@
     "passport-facebook-token": "^3.3.0",
     "passport-jwt": "^4.0.0",
     "shortid": "^2.2.15",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "yargs": "^14.0.0"
   },
   "devDependencies": {
-    "eslint": "^6.4.0",
+    "eslint": "^6.5.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
     "gulp": "4.0.2",
     "gulp-develop-server": "^0.5.2",
     "gulp-watch": "^5.0.1",
-    "husky": "^3.0.5",
+    "husky": "^3.0.7",
     "jest": "24.9.0",
-    "lint-staged": "^9.2.5",
+    "lint-staged": "^9.4.0",
     "mockingoose": "^2.13.2",
     "prettier": "^1.18.2"
   }
