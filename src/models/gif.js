@@ -6,7 +6,7 @@ const timestamps = require('@danilupion/server-utils/middlewares/mongoose/timest
 const comments = require('@danilupion/server-utils/middlewares/mongoose/comments');
 const normalizeJSON = require('@danilupion/server-utils/middlewares/mongoose/normalizeJSON');
 
-const ratings = require('../constants/ratings');
+const gifRatings = require('../constants/ratings');
 const config = require('../config');
 const gifOrder = require('../constants/gifOrder');
 
@@ -50,8 +50,8 @@ const GifSchema = new mongoose.Schema(
     rating: {
       type: String,
       required: true,
-      default: ratings.sfw,
-      enum: Object.keys(ratings).map(roleKey => ratings[roleKey]),
+      default: gifRatings.sfw,
+      enum: Object.keys(gifRatings).map(roleKey => gifRatings[roleKey]),
       index: true,
     },
     viewsCount: {
@@ -93,13 +93,15 @@ const GifSchema = new mongoose.Schema(
   .plugin(owner)
   .plugin(timestamps, { indexCreation: true })
   .plugin(comments)
-  .plugin(normalizeJSON, { rename: { shortId: 'id' } });
+  .plugin(normalizeJSON);
 
 GifSchema.methods.serialize = async function serialize() {
   await this.populate('user').execPopulate();
 
   const {
     id,
+    // eslint-disable-next-line no-shadow
+    shortId,
     color,
     description,
     user,
@@ -113,6 +115,7 @@ GifSchema.methods.serialize = async function serialize() {
 
   return {
     id,
+    shortId,
     color,
     description,
     user: {
@@ -132,32 +135,40 @@ GifSchema.methods.serialize = async function serialize() {
 };
 
 GifSchema.statics.normalizedQuery = async function normalizedQuery({
-  criteria = {},
+  before,
+  user,
+  search,
+  ratings = [gifRatings.sfw],
   order = gifOrder.creation,
   limit = config.pageSizes.gifs,
 }) {
   const query = {};
-  if (criteria.before) {
-    query.created = { $lt: criteria.before };
+  if (before) {
+    // eslint-disable-next-line no-underscore-dangle
+    query._id = { $lt: before };
   }
 
-  if (criteria.user) {
-    query.user = criteria.user;
+  if (user) {
+    query.user = user;
+  }
+
+  if (ratings) {
+    query.rating = { $in: ratings };
   }
 
   const gifsPromise = this.find(query);
 
-  if (criteria.search) {
+  if (search) {
     gifsPromise.or([
       {
         description: {
-          $regex: criteria.search,
+          $regex: search,
           $options: 'i',
         },
       },
       {
         tags: {
-          $regex: criteria.search,
+          $regex: search,
           $options: 'i',
         },
       },

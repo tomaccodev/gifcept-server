@@ -11,7 +11,7 @@ const {
 } = require('@danilupion/server-utils/middlewares/express/jwt-auth');
 
 const config = require('../../../config');
-const { gifQueryMetadataFromRequest } = require('../../../utils/search');
+const { gifQueryFromRequest } = require('../../../utils/search');
 const userMiddleware = require('../../../middlewares/express/user');
 const { Gif, GifFile } = require('../../../models');
 const download = require('../../../utils/download');
@@ -29,7 +29,7 @@ const router = new express.Router();
  */
 router.get('/', async (req, res) => {
   try {
-    const gifs = await Gif.normalizedQuery(gifQueryMetadataFromRequest(req));
+    const gifs = await Gif.normalizedQuery(gifQueryFromRequest(req));
 
     return res.send(await Promise.all(gifs.map(g => g.serialize())));
   } catch (err) {

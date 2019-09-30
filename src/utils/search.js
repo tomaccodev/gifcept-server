@@ -1,22 +1,17 @@
 module.exports = {
-  gifQueryMetadataFromRequest: req => {
-    const criteria = {};
+  gifQueryFromRequest: req => {
     if (req.query) {
-      if (req.query.before) {
-        criteria.before = req.query.before;
-      }
-      if (req.query.search) {
-        criteria.search = req.query.search;
-      }
-    }
-    if (req.user) {
-      // eslint-disable-next-line no-underscore-dangle
-      criteria.user = req.user._id;
+      const { before, user, search, ratings, order } = req.query;
+
+      return {
+        before,
+        user,
+        search,
+        ratings,
+        order,
+      };
     }
 
-    return {
-      criteria,
-      order: req.query && req.query.order,
-    };
+    return {};
   },
 };

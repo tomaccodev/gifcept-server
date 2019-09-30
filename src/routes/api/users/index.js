@@ -9,14 +9,13 @@ const router = new Router();
 
 router.param('id', async (req, res, next, id) => {
   try {
-    console.log(id);
     const user = await User.findById(id);
 
     if (!user) {
       return res.errorHandler(new NotFound());
     }
 
-    req.user = user;
+    req.query.user = user;
     return next();
   } catch (err) {
     return res.errorHandler(err);

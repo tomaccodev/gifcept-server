@@ -8,7 +8,7 @@ const filesToRoutes = require('@danilupion/server-utils/routes/filesToRoutes');
 
 const router = new Router();
 
-const { gifQueryMetadataFromRequest } = require('../../../utils/search');
+const { gifQueryFromRequest } = require('../../../utils/search');
 const { Gif } = require('../../../models');
 
 router.param('id', async (req, res, next, id) => {
@@ -36,7 +36,7 @@ router.param('id', async (req, res, next, id) => {
  */
 router.get('/', async (req, res) => {
   try {
-    const gifs = await Gif.normalizedQuery(gifQueryMetadataFromRequest(req));
+    const gifs = await Gif.normalizedQuery(gifQueryFromRequest(req));
 
     return res.send(await Promise.all(gifs.map(g => g.serialize())));
   } catch (err) {
