@@ -1,0 +1,81 @@
+import { Document, Schema } from 'mongoose';
+
+export interface IWithCreated extends Document {
+  created: Date;
+}
+
+export interface IWithUpdated extends Document {
+  updated?: Date;
+}
+
+export interface ITimestampsMiddlewareOptions {
+  creation?: boolean;
+  update?: boolean;
+  creationField?: string;
+  updateField?: string;
+  indexCreation?: boolean;
+  indexUpdate?: boolean;
+  updateTimestampOnCreation?: boolean;
+}
+
+/**
+ * @param {Mongoose.Schema} schema
+ * @param {boolean} creation
+ * @param {boolean} update
+ * @param {string} creationField
+ * @param {string} updateField
+ * @param {boolean|int} indexCreation
+ * @param {boolean|int} indexUpdate
+ * @param {boolean} updateTimestampOnCreation
+ */
+export default (
+  schema: Schema,
+  {
+    creation = true,
+    update = true,
+    creationField = 'created',
+    updateField = 'updated',
+    indexCreation = false,
+    indexUpdate = false,
+    updateTimestampOnCreation = false,
+  }: ITimestampsMiddlewareOptions = {},
+) => {
+  if (creation) {
+    schema.add({ [creationField]: Date });
+  }
+
+  if (update) {
+    schema.add({ [updateField]: Date });
+  }
+
+  // Bind pre save hook for schema
+  schema.pre('save', function schemaWithTimestampsPreSave(next) {
+    try {
+      const now = new Date();
+      if (creation && this.isNew && !this.get(creationField)) {
+        this.set(creationField, now);
+      }
+      if (update && this.isNew) {
+        this.set(updateField, updateTimestampOnCreation ? now : null);
+      }
+      next();
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  if (update) {
+    // Bind pre update hook for schema http://mongoosejs.com/docs/middleware.html#notes
+    schema.pre('update', function schemaWithTimestampsPreUpdate() {
+      this.update({}, { $set: { [updateField]: new Date() } });
+    });
+  }
+
+  if (creation && indexCreation !== false) {
+    schema.path(creationField).index(indexCreation);
+  }
+
+  if (update && indexUpdate !== false) {
+    schema.path(updateField).index(indexUpdate);
+  }
+};

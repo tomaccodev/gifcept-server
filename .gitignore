@@ -1,0 +1,8 @@
+build
+screenshots/*
+!screenshots/.gitkeep
+.idea
+.DS_Store
+node_modules
+
+config.json

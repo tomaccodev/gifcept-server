@@ -1,0 +1,35 @@
+{
+  "environment": "development",
+  "server":{
+    "port": 3002
+  },
+  "clustered": true,
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "gifcept"
+  },
+  "mysql": {
+    "host": "localhost",
+    "user": "user",
+    "password": "password",
+    "database": "gifcept"
+  },
+  "authentication": {
+    "jwtSecret": "RANDMON STRING",
+    "jwtExpiration": "30m"
+  },
+  "facebook": {
+    "clientId": "FacebookAppClientId",
+    "clientSecret": "FacebookAppClientSecret"
+  },
+  "dirs": {
+    "uploadDir": "/path/to/wherever",
+    "gifsDir": "/path/to/wherever",
+    "importSource": "/path/to/wherever"
+  },
+  "pageSizes": {
+    "gifs": 30,
+    "tags": 20
+  }
+}
