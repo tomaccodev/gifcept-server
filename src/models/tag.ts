@@ -11,7 +11,7 @@ const TagSchema = new Schema(
     name: {
       type: String,
       required: true,
-      index: true,
+      index: "text",
     },
   },
   { collection: 'tags' },

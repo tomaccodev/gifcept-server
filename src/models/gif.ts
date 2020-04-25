@@ -72,6 +72,7 @@ const GifSchema = new Schema(
     },
     description: {
       type: String,
+      index: 'text',
       default: null,
     },
     rating: {
@@ -88,6 +89,7 @@ const GifSchema = new Schema(
     },
     tags: {
       type: [String],
+      index: "text",
       default: [],
     },
     likes: {
