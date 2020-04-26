@@ -9,6 +9,7 @@ export const generateToken = (user: IUser) =>
       {
         id: user._id,
         email: user.email,
+        username: user.username,
         role: user.role,
       },
       config.authentication.jwtSecret,

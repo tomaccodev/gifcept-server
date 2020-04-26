@@ -2,6 +2,7 @@ import { Request } from 'express';
 
 import config from '../../../../config.json';
 import { handler } from '../../../helpers/express';
+import { Rating } from '../../../models/common/constants';
 import Gif from '../../../models/gif';
 
 interface IGifQuery {
@@ -11,6 +12,7 @@ interface IGifQuery {
   $text?: {
     $search: string;
   };
+  rating?: Rating;
 }
 
 const queryFromReq = (req: Request) => {
@@ -21,6 +23,9 @@ const queryFromReq = (req: Request) => {
   }
   if (req.query.matching) {
     query.$text = { $search: req.query.matching };
+  }
+  if (req.query.rating) {
+    query.rating = req.query.rating;
   }
   return query;
 };
