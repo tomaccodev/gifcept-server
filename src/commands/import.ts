@@ -9,8 +9,8 @@ import { Rating } from '../models/common/constants';
 import Gif, { IGif } from '../models/gif';
 import GifFile, { IGifFile } from '../models/gifFile';
 import User, { IUser, Role } from '../models/user';
-import { getImagePredominantHexColor, saveFrameFromGif } from '../utils/images';
 import { copy } from '../utils/files';
+import { getImagePredominantHexColor, saveFrameFromGif } from '../utils/images';
 
 interface IMysqlModel {
   id: number;

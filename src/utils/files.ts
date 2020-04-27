@@ -1,10 +1,18 @@
-import { createReadStream, createWriteStream, rename, stat } from 'fs';
+import { createReadStream, createWriteStream, rename, stat, unlink } from 'fs';
 import { promisify } from 'util';
 
-export const getFileSize = (pathToFile: string) =>
-  promisify(stat)(pathToFile).then((stats) => stats.size);
+const promisifiedStat = promisify(stat);
 
-export const move = (src: string, dest: string) => promisify(rename)(src, dest);
+const promisifiedRename = promisify(rename);
+
+const promisifiedUnlink = promisify(unlink);
+
+export const getFileSize = (pathToFile: string) =>
+  promisifiedStat(pathToFile).then((stats) => stats.size);
+
+export const move = (src: string, dest: string) => promisifiedRename(src, dest);
+
+export const remove = (src: string) => promisifiedUnlink(src);
 
 export const copy = (src: string, dest: string) =>
   new Promise((res, rej) => {

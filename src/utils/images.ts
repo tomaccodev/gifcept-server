@@ -1,11 +1,11 @@
-import gm from 'gm';
+import gm, { Dimensions } from 'gm';
 import { PassThrough } from 'stream';
 import { promisify } from 'util';
 
 export const getSize = (pathToFile: string) => {
   const image = gm(pathToFile);
 
-  return promisify(image.size.bind(image))();
+  return promisify<Dimensions>(image.size.bind(image))();
 };
 
 export const getImagePredominantHexColor = async (pathToFile: string) =>

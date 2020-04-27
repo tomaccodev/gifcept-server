@@ -36,10 +36,10 @@
     "@types/gm": "^1.18.7",
     "@types/helmet": "^0.0.45",
     "@types/jsonwebtoken": "^8.3.9",
-    "@types/mongoose": "^5.7.13",
+    "@types/mongoose": "^5.7.14",
     "@types/morgan": "^1.9.0",
     "@types/mysql2": "types/mysql2",
-    "@types/node": "^13.13.2",
+    "@types/node": "^13.13.4",
     "@types/passport": "^1.0.3",
     "@types/passport-jwt": "^3.0.3",
     "@types/shortid": "^0.0.29",
@@ -51,19 +51,18 @@
     "pretty-quick": "^2.0.1",
     "ts-node": "^8.9.1",
     "ts-node-dev": "^1.0.0-pre.44",
-    "tslint": "^6.1.1",
+    "tslint": "^6.1.2",
     "typescript": "^3.8.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
       "pretty-quick --staged",
-      "yarn lint-fix",
-      "tsc --noEmit"
+      "yarn lint-fix"
     ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged && tsc --noEmit"
     }
   }
 }

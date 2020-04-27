@@ -1,3 +1,3 @@
-import { check } from 'express-validator';
+import { body } from 'express-validator';
 
-export const validateCommentCreation = check('comment').exists();
+export const validateCommentCreation = body('comment').exists();

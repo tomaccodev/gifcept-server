@@ -1,3 +1,3 @@
-import { check } from 'express-validator';
+import { body } from 'express-validator';
 
-export const validateTokenCreation = [check('email').isEmail(), check('password').exists()];
+export const validateTokenCreation = [body('email').isEmail(), body('password').exists()];

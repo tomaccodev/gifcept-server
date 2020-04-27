@@ -1,4 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, model, Schema, Types } from 'mongoose';
 
 import timestamps, { IWithCreated, IWithUpdated } from '../middleware/mongoose/timestamps';
 
@@ -26,7 +26,7 @@ export interface IGifFile extends Document, IWithCreated, IWithUpdated {
   color: string;
   fileSize: number;
   frameFileSize: number;
-  importationUrls: IImportationUrl[];
+  importationUrls: Types.DocumentArray<IImportationUrl>;
   moderatedRating: Rating;
 }
 
