@@ -1,7 +1,9 @@
 /* tslint:disable:no-console */
+import { fork, isMaster } from 'cluster';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { cpus } from 'os';
 import path from 'path';
 
 import config from '../config.json';
@@ -45,7 +47,14 @@ const startServer = async () => {
   console.error(`Listening in port ${config.server.port}`);
 };
 
-startServer().catch((e) => console.log('Error while creating the server', e));
+if (config.clustered && isMaster) {
+  // Create a worker for each CPU
+  for (const cpu of cpus()) {
+    fork();
+  }
+} else {
+  startServer().catch((e) => console.log('Error while creating the server', e));
+}
 
 process.on('unhandledRejection', (reason, p) => {
   console.error('Unhandled Rejection at:', p, 'reason:', reason);
