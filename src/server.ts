@@ -1,4 +1,5 @@
 /* tslint:disable:no-console */
+import bodyParser from 'body-parser';
 import { fork, isMaster } from 'cluster';
 import express from 'express';
 import helmet from 'helmet';
@@ -17,7 +18,8 @@ const app = express();
 
 const startServer = async () => {
   // Configure body parser to accept json
-  app.use(express.json());
+  app.use(bodyParser.json({ limit: '20mb' }));
+  app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
   // Configure some security headers
   app.use(helmet());
