@@ -16,6 +16,7 @@ import User from '../../../models/user';
 import { downloadFile } from '../../../utils/download';
 import { getFileSize, md5hash, move, remove } from '../../../utils/files';
 import { getImagePredominantHexColor, getSize, saveFrameFromGif } from '../../../utils/images';
+import { IRequestWithGif } from '../../common/handlers/gifs';
 
 interface IGifQuery {
   _id?: {
@@ -139,4 +140,20 @@ export const addGifByUpload = handler(async (req, res, next) => {
   }
 
   return res.send(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id));
+});
+
+export const updateGif = handler(async (req, res, next) => {
+  const gif = (req as IRequestWithGif).gif;
+
+  if (req.body.description) {
+    gif.description = req.body.description;
+  }
+  if (req.body.tags) {
+    gif.tags = req.body.tags;
+  }
+
+  await gif.save();
+  await gif.populate('user');
+
+  return res.send(gif);
 });

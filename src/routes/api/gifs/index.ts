@@ -3,20 +3,20 @@ import multer from 'multer';
 import { promisify } from 'util';
 
 import config from '../../../../config.json';
-import { ClientErrorBadRequest } from '../../../error/httpException';
 import jwtAuthMiddleware from '../../../middleware/express/jwtAuth';
-import { gifByShortId } from '../../common/handlers/gifs';
+import { gifById } from '../../common/handlers/gifs';
+import { ownedByUser } from '../../common/validators/gifs';
 
-import { addGifByUpload, addGifByUrl, getGifs } from './handlers';
-import { validateGifCreation } from './validators';
+import { addGifByUpload, addGifByUrl, getGifs, updateGif } from './handlers';
+import { validateGifCreationByUrl, validateGifUpdate } from './validators';
 
 const router = Router();
 const upload = multer({ dest: config.dirs.uploadDir });
 
 const promisifiedUploadGif = promisify(upload.single('gif'));
-const promisifiedValidateGifCreate = promisify(validateGifCreation);
+const promisifiedValidateGifCreate = promisify(validateGifCreationByUrl);
 
-router.param('id', gifByShortId);
+router.param('id', gifById);
 
 router.get('/', getGifs);
 
@@ -29,6 +29,7 @@ router.post('/', jwtAuthMiddleware, async (req, res, next) => {
     return addGifByUrl(req, res, next);
   }
 });
-router.post('/', jwtAuthMiddleware, validateGifCreation, addGifByUrl);
+
+router.patch('/:id', jwtAuthMiddleware, validateGifUpdate, ownedByUser, updateGif);
 
 export default router;
