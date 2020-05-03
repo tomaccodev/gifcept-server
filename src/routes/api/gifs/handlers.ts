@@ -148,6 +148,9 @@ export const updateGif = handler(async (req, res, next) => {
   if (req.body.description) {
     gif.description = req.body.description;
   }
+  if (req.body.rating) {
+    gif.rating = req.body.rating;
+  }
   if (req.body.tags) {
     gif.tags = req.body.tags;
   }
