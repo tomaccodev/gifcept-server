@@ -18,29 +18,41 @@ import { getFileSize, md5hash, move, remove } from '../../../utils/files';
 import { getImagePredominantHexColor, getSize, saveFrameFromGif } from '../../../utils/images';
 import { IRequestWithGif } from '../../common/handlers/gifs';
 
-interface IGifQuery {
+interface IGifSimpleQuery {
   _id?: {
     $lt: string;
   };
-  $text?: {
-    $search: string;
+  description?: {
+    $regex: RegExp;
+    $options: string;
+  };
+  tags?: {
+    $regex: RegExp;
+    $options: string;
   };
   rating?: Rating;
 }
 
 const queryFromReq = (req: Request) => {
-  const query: IGifQuery = {};
+  const query: IGifSimpleQuery = {};
 
   if (req.query.before) {
     query._id = { $lt: req.query.before };
   }
-  if (req.query.matching) {
-    query.$text = { $search: req.query.matching };
-  }
   if (req.query.rating) {
     query.rating = req.query.rating;
   }
-  return query;
+  if (req.query.matching) {
+    const regExpCondition = { $regex: new RegExp(req.query.matching), $options: 'i' };
+    return {
+      $or: [
+        { ...query, description: regExpCondition },
+        { ...query, tags: regExpCondition },
+      ],
+    };
+  } else {
+    return query;
+  }
 };
 
 export const getGifs = handler(async (req, res, next) => {
