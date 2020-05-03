@@ -6,7 +6,9 @@ import User from '../../../../models/user';
 import { generateToken } from '../../../../utils/tokens';
 
 export const createToken: RequestHandler = handler(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({
+    $or: [{ email: req.body.usernameOrEmail }, { username: req.body.usernameOrEmail }],
+  });
 
   if (!user) {
     return next(new ClientErrorUnauthorized());
