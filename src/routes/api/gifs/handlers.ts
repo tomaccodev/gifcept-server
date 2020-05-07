@@ -172,3 +172,11 @@ export const updateGif = handler(async (req, res, next) => {
 
   return res.send(gif);
 });
+
+export const deleteGif = handler(async (req, res, next) => {
+  const gif = (req as IRequestWithGif).gif;
+
+  await gif.remove();
+
+  return res.send();
+});
