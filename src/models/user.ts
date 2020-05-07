@@ -36,4 +36,8 @@ const UserSchema = new Schema(
   .plugin(password, { required: false })
   .plugin(timestamps);
 
+UserSchema.set('toJSON', {
+  virtuals: true,
+});
+
 export default model<IUser>('User', UserSchema);

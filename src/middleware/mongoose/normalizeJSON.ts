@@ -5,6 +5,7 @@ export interface INormalizeJSONOptions {
     [key: string]: string;
   };
   remove?: string[];
+  virtuals?: boolean;
 }
 
 /**
@@ -14,28 +15,38 @@ export interface INormalizeJSONOptions {
  */
 export default (
   schema: Schema,
-  {
-    rename = {
-      _id: 'id',
-    },
-    remove = ['__v'],
-  }: INormalizeJSONOptions = {},
+  { rename = {}, remove = ['__v'], virtuals = true }: INormalizeJSONOptions = {},
 ) => {
   schema.set('toJSON', {
+    virtuals,
     transform: (doc, json) => {
+      // handle renames
       for (const [from, to] of Object.entries(rename)) {
         const parts = from.split('.');
-        let value = json[parts[0]];
-        for (const part of parts.slice(1)) {
+        let value = json;
+        for (const part of parts) {
           value = value[part];
         }
         delete json[from];
         json[to] = value;
       }
 
+      // handle removals
       for (const prop of remove) {
-        if (typeof json[prop] !== 'undefined') {
-          delete json[prop];
+        const parts = prop.split('.');
+        let sources = [json];
+        for (const part of parts.slice(0, -1)) {
+          if (part === '*') {
+            sources = sources.flat();
+          } else {
+            sources = sources.map((s) => s[part]);
+          }
+        }
+        const sourceProp = parts.slice(-1)[0];
+        for (const source of sources) {
+          if (typeof source[sourceProp] !== 'undefined') {
+            delete source[sourceProp];
+          }
         }
       }
 

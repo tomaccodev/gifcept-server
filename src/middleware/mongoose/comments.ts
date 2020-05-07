@@ -1,4 +1,4 @@
-import { Document, Schema, Types } from 'mongoose';
+import { Document, DocumentToObjectOptions, Schema, Types } from 'mongoose';
 
 import ownerPlugin, { IOwnerMiddlewareOptions } from './owner';
 import timestampsPlugin, {
@@ -25,6 +25,7 @@ interface ICommentsMiddlewareOptions {
   authorOptions?: IOwnerMiddlewareOptions;
   timestamps?: boolean;
   timestampsOptions?: ITimestampsMiddlewareOptions;
+  toJsonOptions?: DocumentToObjectOptions;
 }
 
 /**
@@ -37,6 +38,7 @@ interface ICommentsMiddlewareOptions {
  * @param {object} authorOptions
  * @param {boolean} timestamps
  * @param {object} timestampsOptions
+ * @param toJsonOptions
  */
 export default (
   schema: Schema,
@@ -49,6 +51,7 @@ export default (
     authorOptions = { field: 'user' },
     timestamps = true,
     timestampsOptions = {},
+    toJsonOptions = { virtuals: true },
   }: ICommentsMiddlewareOptions = {},
 ) => {
   const commentSchema = new Schema({
@@ -72,4 +75,6 @@ export default (
       default: defaultValue,
     },
   });
+
+  schema.set('toJSON', toJsonOptions);
 };

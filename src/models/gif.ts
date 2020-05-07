@@ -14,6 +14,10 @@ export interface ILike extends IWithCreated, IWithOwner<IUser> {}
 
 const LikeSchema = new Schema({}).plugin(owner).plugin(timestamps, { update: false });
 
+LikeSchema.set('toJSON', {
+  virtuals: true,
+});
+
 export interface IShare extends IWithCreated, IWithOwner<IUser> {
   gif: IGif;
 }
@@ -28,6 +32,10 @@ const ShareSchema = new Schema({
 })
   .plugin(owner)
   .plugin(timestamps, { update: false });
+
+ShareSchema.set('toJSON', {
+  virtuals: true,
+});
 
 export interface IGif
   extends Document,
@@ -89,7 +97,7 @@ const GifSchema = new Schema(
     },
     tags: {
       type: [String],
-      index: "text",
+      index: 'text',
       default: [],
     },
     likes: {
@@ -123,12 +131,17 @@ const GifSchema = new Schema(
   .plugin(timestamps, { indexCreation: true })
   .plugin(comments)
   .plugin(normalizeJSON, {
-    rename: {
-      _id: 'id',
-      'user.username': 'userName',
-      'user._id': 'userId',
-    },
-    remove: ['__v', 'gifFile', 'user'],
+    remove: [
+      '_id',
+      '__v',
+      'gifFile',
+      'user._id',
+      'likes.*._id',
+      'likes.*.user._id',
+      'comments.*._id',
+      'comments.*.user._id',
+    ],
+    virtuals: true,
   });
 
 export default model<IGif>('Gif', GifSchema);

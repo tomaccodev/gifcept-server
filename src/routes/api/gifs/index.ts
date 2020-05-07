@@ -7,7 +7,7 @@ import jwtAuthMiddleware from '../../../middleware/express/jwtAuth';
 import { gifById } from '../../common/handlers/gifs';
 import { ownedByUser } from '../../common/validators/gifs';
 
-import { addGifByUpload, addGifByUrl, getGifs, updateGif } from './handlers';
+import { addGifByUpload, addGifByUrl, deleteGif, getGifs, updateGif } from './handlers';
 import { validateGifCreationByUrl, validateGifUpdate } from './validators';
 
 const router = Router();
@@ -31,5 +31,7 @@ router.post('/', jwtAuthMiddleware, async (req, res, next) => {
 });
 
 router.patch('/:id', jwtAuthMiddleware, validateGifUpdate, ownedByUser, updateGif);
+
+router.delete('/:id', jwtAuthMiddleware, ownedByUser, deleteGif);
 
 export default router;

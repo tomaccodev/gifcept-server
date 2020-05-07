@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Document, DocumentQuery } from 'mongoose';
 import { basename, extname, join } from 'path';
 import { v4 } from 'uuid';
 
@@ -10,7 +11,7 @@ import {
 import { handler } from '../../../helpers/express';
 import { IRequestWithJwtToken } from '../../../middleware/express/jwtAuth';
 import { Rating } from '../../../models/common/constants';
-import Gif from '../../../models/gif';
+import Gif, { IGif } from '../../../models/gif';
 import GifFile, { IGifFile } from '../../../models/gifFile';
 import User from '../../../models/user';
 import { downloadFile } from '../../../utils/download';
@@ -55,14 +56,21 @@ const queryFromReq = (req: Request) => {
   }
 };
 
+const normalize = (toNormalize: DocumentQuery<IGif[] | IGif, any> | IGif) =>
+  toNormalize
+    .populate('user', 'username')
+    .populate('likes.user', 'username')
+    .populate('comments.user', 'username')
+    .populate('shares.user', 'username');
+
 export const getGifs = handler(async (req, res, next) => {
-  const gifs = await Gif.find(queryFromReq(req), null, {
-    sort: {
-      created: -1,
-    },
-  })
-    .limit(config.pageSizes.gifs)
-    .populate('user');
+  const gifs = await normalize(
+    Gif.find(queryFromReq(req), null, {
+      sort: {
+        created: -1,
+      },
+    }).limit(config.pageSizes.gifs),
+  );
 
   return res.send(gifs);
 });
@@ -168,7 +176,15 @@ export const updateGif = handler(async (req, res, next) => {
   }
 
   await gif.save();
-  await gif.populate('user');
+  await normalize(gif);
 
   return res.send(gif);
+});
+
+export const deleteGif = handler(async (req, res, next) => {
+  const gif = (req as IRequestWithGif).gif;
+
+  await gif.remove();
+
+  return res.send();
 });
