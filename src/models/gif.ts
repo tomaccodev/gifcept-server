@@ -12,11 +12,13 @@ import { IUser } from './user';
 
 export interface ILike extends IWithCreated, IWithOwner<IUser> {}
 
-const LikeSchema = new Schema({}).plugin(owner).plugin(timestamps, { update: false });
-
-LikeSchema.set('toJSON', {
-  virtuals: true,
-});
+const LikeSchema = new Schema({})
+  .plugin(owner)
+  .plugin(timestamps, { update: false })
+  .plugin(normalizeJSON, {
+    remove: ['_id', 'user._id', 'user.created'],
+    virtuals: true,
+  });
 
 export interface IShare extends IWithCreated, IWithOwner<IUser> {
   gif: IGif;
@@ -136,10 +138,9 @@ const GifSchema = new Schema(
       '__v',
       'gifFile',
       'user._id',
-      'likes.*._id',
-      'likes.*.user._id',
       'comments.*._id',
       'comments.*.user._id',
+      'comments.*.user.created',
     ],
     virtuals: true,
   });

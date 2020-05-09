@@ -8,6 +8,7 @@ import { gifById } from '../../common/handlers/gifs';
 import { ownedByUser } from '../../common/validators/gifs';
 
 import { addGifByUpload, addGifByUrl, deleteGif, getGifs, updateGif } from './handlers';
+import likes from './likes';
 import { validateGifCreationByUrl, validateGifUpdate } from './validators';
 
 const router = Router();
@@ -17,6 +18,8 @@ const promisifiedUploadGif = promisify(upload.single('gif'));
 const promisifiedValidateGifCreate = promisify(validateGifCreationByUrl);
 
 router.param('id', gifById);
+
+router.use('/:id/likes', likes);
 
 router.get('/', getGifs);
 

@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { Document, DocumentQuery } from 'mongoose';
+import { DocumentQuery } from 'mongoose';
 import { basename, extname, join } from 'path';
 import { v4 } from 'uuid';
 

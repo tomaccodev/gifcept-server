@@ -68,6 +68,8 @@ export default (
     commentSchema.plugin(timestampsPlugin, timestampsOptions);
   }
 
+  commentSchema.set('toJSON', toJsonOptions);
+
   schema.add({
     [field]: {
       type: multiple ? [commentSchema] : commentSchema,
@@ -75,6 +77,4 @@ export default (
       default: defaultValue,
     },
   });
-
-  schema.set('toJSON', toJsonOptions);
 };

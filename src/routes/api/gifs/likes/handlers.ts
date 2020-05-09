@@ -17,14 +17,15 @@ export const addLike = handler(async (req, res, next) => {
     return next(new ClientErrorBadRequest());
   }
 
-  gif.likes.push({
+  const position = gif.likes.push({
     user: new Types.ObjectId(userId),
   });
-  gif.likesCount = gif.likes.length;
+  gif.likesCount = position;
 
   await gif.save();
+  await gif.populate(`likes.${position - 1}.user`, 'username').execPopulate();
 
-  return res.send();
+  return res.send(gif!.likes[position - 1]);
 });
 
 export const removeLike = handler(async (req, res, next) => {
