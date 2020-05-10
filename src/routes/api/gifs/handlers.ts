@@ -56,12 +56,17 @@ const queryFromReq = (req: Request) => {
   }
 };
 
-const normalize = (toNormalize: DocumentQuery<IGif[] | IGif, any> | IGif) =>
-  toNormalize
+const normalize = (toNormalize: DocumentQuery<IGif[] | IGif, any> | IGif) => {
+  const normalizedValue = toNormalize
     .populate('user', 'username')
     .populate('likes.user', 'username')
     .populate('comments.user', 'username')
     .populate('shares.user', 'username');
+
+  return (normalizedValue as IGif).execPopulate
+    ? (normalizedValue as IGif).execPopulate()
+    : normalizedValue;
+};
 
 export const getGifs = handler(async (req, res, next) => {
   const gifs = await normalize(
@@ -146,7 +151,9 @@ export const addGifByUrl = handler(async (req, res, next) => {
     return next(new ServerErrorInternalServerError());
   }
 
-  return res.send(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id));
+  return res.send(
+    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id)),
+  );
 });
 
 export const addGifByUpload = handler(async (req, res, next) => {
@@ -159,7 +166,9 @@ export const addGifByUpload = handler(async (req, res, next) => {
     return next(new ServerErrorInternalServerError());
   }
 
-  return res.send(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id));
+  return res.send(
+    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id)),
+  );
 });
 
 export const updateGif = handler(async (req, res, next) => {
