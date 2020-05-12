@@ -5,7 +5,7 @@ import { IRequestWithJwtToken } from '../../../middleware/express/jwtAuth';
 import { IRequestWithGif } from '../handlers/gifs';
 
 export const ownedByUser = (req: Request, res: Response, next: NextFunction) => {
-  const userId = (req as IRequestWithJwtToken).user.id;
+  const userId = (req as IRequestWithJwtToken).authUser.id;
   const gif = (req as IRequestWithGif).gif;
 
   if (userId !== gif.user.toString()) {

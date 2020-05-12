@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { DocumentQuery } from 'mongoose';
+import { DocumentQuery, Types } from 'mongoose';
 import { basename, extname, join } from 'path';
 import { v4 } from 'uuid';
 
@@ -18,11 +18,13 @@ import { downloadFile } from '../../../utils/download';
 import { getFileSize, md5hash, move, remove } from '../../../utils/files';
 import { getImagePredominantHexColor, getSize, saveFrameFromGif } from '../../../utils/images';
 import { IRequestWithGif } from '../../common/handlers/gifs';
+import { IRequestWithUser } from '../../common/handlers/users';
 
 interface IGifSimpleQuery {
   _id?: {
     $lt: string;
   };
+  user?: Types.ObjectId;
   description?: {
     $regex: RegExp;
     $options: string;
@@ -37,6 +39,9 @@ interface IGifSimpleQuery {
 const queryFromReq = (req: Request) => {
   const query: IGifSimpleQuery = {};
 
+  if ((req as IRequestWithUser).user) {
+    query.user = (req as IRequestWithUser).user._id;
+  }
   if (req.query.before) {
     query._id = { $lt: req.query.before };
   }
@@ -152,7 +157,7 @@ export const addGifByUrl = handler(async (req, res, next) => {
   }
 
   return res.send(
-    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id)),
+    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).authUser.id)),
   );
 });
 
@@ -167,7 +172,7 @@ export const addGifByUpload = handler(async (req, res, next) => {
   }
 
   return res.send(
-    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).user.id)),
+    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).authUser.id)),
   );
 });
 

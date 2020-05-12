@@ -4,7 +4,7 @@ import Gif from '../../../models/gif';
 
 export const getUserTags = handler(async (req, res, next) => {
   const userGifs = await Gif.find({
-    user: (req as IRequestWithJwtToken).user.id,
+    user: (req as IRequestWithJwtToken).authUser.id,
   });
 
   const tags: string[] = [];

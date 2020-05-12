@@ -8,7 +8,7 @@ import { IRequestWithGif } from '../../../common/handlers/gifs';
 
 export const addLike = handler(async (req, res, next) => {
   const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).user.id;
+  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
 
   // Check if the gif is already liked by current user
   const like = gif.likes.find((l) => (l.user as IUser)._id.equals(userId));
@@ -30,7 +30,7 @@ export const addLike = handler(async (req, res, next) => {
 
 export const removeLike = handler(async (req, res, next) => {
   const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).user.id;
+  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
 
   // Check if the gif is already liked by current user
   const like = gif.likes.find((l) => (l.user as IUser)._id.equals(userId));

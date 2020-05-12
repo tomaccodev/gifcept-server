@@ -6,11 +6,10 @@ import config from '../../../config.json';
 import { ClientErrorUnauthorized } from '../../error/httpException';
 
 export interface IRequestWithJwtToken extends Request {
-  user: {
+  authUser: {
     id: string;
   };
 }
-
 
 const params = {
   secretOrKey: config.authentication.jwtSecret,
@@ -32,4 +31,4 @@ const strategy = new Strategy(params, (payload, done) => {
 
 passport.use(strategy);
 
-export default passport.authenticate('jwt', { session: false });
+export default passport.authenticate('jwt', { session: false, assignProperty: 'authUser' });

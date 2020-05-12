@@ -15,7 +15,7 @@ export const getGifComments = handler(async (req, res, next) => {
 
 export const addComment = handler(async (req, res, next) => {
   const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).user.id;
+  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
 
   gif.comments.push({
     text: req.body.comment.trim(),
@@ -37,7 +37,7 @@ export const addComment = handler(async (req, res, next) => {
 
 export const removeComment = handler(async (req, res, next) => {
   const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).user.id;
+  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
 
   const comment = gif.comments.id(req.params.id);
 
