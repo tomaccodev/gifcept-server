@@ -1,6 +1,8 @@
-import { body, oneOf } from 'express-validator';
+import { body, oneOf, param } from 'express-validator';
 
 import { Rating } from '../../../models/common/constants';
+
+export const validateGifId = param('id').isMongoId();
 
 export const validateGifCreationByUrl = body('url').isURL();
 

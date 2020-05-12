@@ -8,9 +8,9 @@ export interface IRequestWithUser extends Request {
   user: IUser;
 }
 
-export const userById = paramHandler(async (req, res, next, id) => {
+export const userByUsername = paramHandler(async (req, res, next, id) => {
   const user = await User.findOne({
-    _id: id,
+    username: id,
   });
 
   if (!user) {
