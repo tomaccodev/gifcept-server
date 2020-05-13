@@ -19,6 +19,7 @@ import { getFileSize, md5hash, move, remove } from '../../../utils/files';
 import { getImagePredominantHexColor, getSize, saveFrameFromGif } from '../../../utils/images';
 import { IRequestWithGif } from '../../common/handlers/gifs';
 import { IRequestWithUser } from '../../common/handlers/users';
+import { IRequestWithTag } from '../tags/handlers';
 
 interface IGifSimpleQuery {
   _id?: {
@@ -48,14 +49,29 @@ const queryFromReq = (req: Request) => {
   if (req.query.rating) {
     query.rating = req.query.rating;
   }
+  if ((req as IRequestWithTag).tag) {
+    query.tags = {
+      $regex: new RegExp(`^${(req as IRequestWithTag).tag}$`),
+      $options: 'i',
+    };
+  }
   if (req.query.matching) {
     const regExpCondition = { $regex: new RegExp(req.query.matching), $options: 'i' };
-    return {
-      $or: [
-        { ...query, description: regExpCondition },
-        { ...query, tags: regExpCondition },
-      ],
-    };
+    return query.tags
+      ? {
+          $and: [
+            { ...query },
+            {
+              $or: [{ description: regExpCondition }, { tags: regExpCondition }],
+            },
+          ],
+        }
+      : {
+          $or: [
+            { ...query, description: regExpCondition },
+            { ...query, tags: regExpCondition },
+          ],
+        };
   } else {
     return query;
   }
@@ -68,7 +84,7 @@ const normalize = (toNormalize: DocumentQuery<IGif[] | IGif, any> | IGif) => {
     .populate('comments.user', 'username')
     .populate('shares.user', 'username');
 
-  return (normalizedValue as IGif).execPopulate
+  return (normalizedValue as any).execPopulate
     ? (normalizedValue as IGif).execPopulate()
     : normalizedValue;
 };
