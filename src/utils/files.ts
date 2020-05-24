@@ -8,14 +8,14 @@ const promisifiedRename = promisify(rename);
 
 const promisifiedUnlink = promisify(unlink);
 
-export const getFileSize = (pathToFile: string) =>
+export const getFileSize = (pathToFile: string): Promise<number> =>
   promisifiedStat(pathToFile).then((stats) => stats.size);
 
-export const move = (src: string, dest: string) => promisifiedRename(src, dest);
+export const move = (src: string, dest: string): Promise<void> => promisifiedRename(src, dest);
 
-export const remove = (src: string) => promisifiedUnlink(src);
+export const remove = (src: string): Promise<void> => promisifiedUnlink(src);
 
-export const copy = (src: string, dest: string) =>
+export const copy = (src: string, dest: string): Promise<void> =>
   new Promise((res, rej) => {
     const srcStream = createReadStream(src);
     const destStream = createWriteStream(dest);

@@ -1,20 +1,18 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 import config from '../../../config.json';
 import { HttpException } from '../../error/httpException';
 
-export default (error: HttpException, request: Request, response: Response, next: NextFunction) => {
+export default (error: HttpException, _: Request, res: Response): void => {
   const status = error.statusCode;
   const message = error.message;
 
   if (config.environment === 'development') {
-    // tslint:disable-next-line:no-console
     console.log(error);
     if (error.optionalParams && error.optionalParams.debug) {
-      // tslint:disable-next-line:no-console
       console.log('Error debug information:', error.optionalParams.debug);
     }
   }
 
-  response.status(status).send(message);
+  res.status(status).send(message);
 };

@@ -2,14 +2,14 @@ import { Request } from 'express';
 
 import { ClientErrorNotFound } from '../../../error/httpException';
 import { paramHandler } from '../../../helpers/express';
-import Gif, { IGif } from '../../../models/gif';
+import GifModel, { Gif } from '../../../models/gif';
 
-export interface IRequestWithGif extends Request {
-  gif: IGif;
+export interface RequestWithGif extends Request {
+  gif: Gif;
 }
 
-export const gifByShortId = paramHandler(async (req, res, next, id) => {
-  const gif = await Gif.findOne({
+export const gifByShortId = paramHandler(async (req, _, next, id) => {
+  const gif = await GifModel.findOne({
     shortId: id,
   });
 
@@ -17,12 +17,12 @@ export const gifByShortId = paramHandler(async (req, res, next, id) => {
     return next(new ClientErrorNotFound());
   }
 
-  ((req as unknown) as IRequestWithGif).gif = gif;
-  return next();
+  ((req as unknown) as RequestWithGif).gif = gif;
+  next();
 });
 
-export const gifById = paramHandler(async (req, res, next, id) => {
-  const gif = await Gif.findOne({
+export const gifById = paramHandler(async (req, _, next, id) => {
+  const gif = await GifModel.findOne({
     _id: id,
   });
 
@@ -30,6 +30,6 @@ export const gifById = paramHandler(async (req, res, next, id) => {
     return next(new ClientErrorNotFound());
   }
 
-  ((req as unknown) as IRequestWithGif).gif = gif;
-  return next();
+  ((req as unknown) as RequestWithGif).gif = gif;
+  next();
 });

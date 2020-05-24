@@ -5,7 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import config from '../../../config.json';
 import { ClientErrorUnauthorized } from '../../error/httpException';
 
-export interface IRequestWithJwtToken extends Request {
+export interface RequestWithJwtToken extends Request {
   authUser: {
     id: string;
   };

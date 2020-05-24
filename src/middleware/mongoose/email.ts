@@ -1,10 +1,10 @@
 import { Document, Schema, SchemaDefinition } from 'mongoose';
 
-export interface IWithEmail extends Document {
+export interface WithEmail extends Document {
   email: string;
 }
 
-interface IEmailMiddlewareOptions {
+interface EmailMiddlewareOptions {
   field?: string;
   required?: boolean;
   unique?: boolean;
@@ -31,8 +31,8 @@ export default (
     index = true,
     match = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i,
     doesNotMatchMessage = `Value for '${field}' is not a valid email`,
-  }: IEmailMiddlewareOptions = {},
-) => {
+  }: EmailMiddlewareOptions = {},
+): void => {
   const fieldDescription: SchemaDefinition = {
     [field]: {
       type: String,

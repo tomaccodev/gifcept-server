@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import { Document, Schema, SchemaDefinition } from 'mongoose';
 
-export interface IWithPassword extends Document {
+export interface WithPassword extends Document {
   password: string;
 }
 
-interface IPasswordMiddlewareOptions {
+interface PasswordMiddlewareOptions {
   field?: string;
   required?: boolean;
   saltingRounds?: number;
@@ -30,10 +30,11 @@ export default (
     required = true,
     saltingRounds = 10,
     comparisonFunction = 'comparePassword',
+    // eslint-disable-next-line no-useless-escape
     match = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%\^\&*\)\(\]\[\+=\.,_-]).{8,}$/,
     doesNotMatchMessage = `${field} must be at least 8 chars, contain 1 number, lower and upper case and special char`,
-  }: IPasswordMiddlewareOptions = {},
-) => {
+  }: PasswordMiddlewareOptions = {},
+): void => {
   const fieldDescription: SchemaDefinition = {
     [field]: {
       type: String,
@@ -53,13 +54,15 @@ export default (
     try {
       // generate a hash and override the clear text password with the hashed one
       this.set(field, await bcrypt.hash(this.get(field), saltingRounds));
-      return next();
+      next();
     } catch (err) {
       return next(err);
     }
   });
 
-  schema.methods[comparisonFunction] = function comparePassword(candidate: string) {
+  schema.methods[comparisonFunction] = function comparePassword(
+    candidate: string,
+  ): Promise<boolean> {
     return bcrypt.compare(candidate, this.password).catch(() => false);
   };
 };

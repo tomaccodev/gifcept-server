@@ -2,16 +2,17 @@ import { Types } from 'mongoose';
 
 import { ClientErrorBadRequest } from '../../../../error/httpException';
 import { handler } from '../../../../helpers/express';
-import { IRequestWithJwtToken } from '../../../../middleware/express/jwtAuth';
-import { IUser } from '../../../../models/user';
-import { IRequestWithGif } from '../../../common/handlers/gifs';
+import { RequestWithJwtToken } from '../../../../middleware/express/jwtAuth';
+import { Like } from '../../../../models/gif';
+import { User } from '../../../../models/user';
+import { RequestWithGif } from '../../../common/handlers/gifs';
 
 export const addLike = handler(async (req, res, next) => {
-  const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
+  const gif = ((req as unknown) as RequestWithGif).gif;
+  const userId = ((req as unknown) as RequestWithJwtToken).authUser.id;
 
   // Check if the gif is already liked by current user
-  const like = gif.likes.find((l) => (l.user as IUser)._id.equals(userId));
+  const like = gif.likes.find((l: Like) => (l.user as User)._id.equals(userId));
 
   if (like) {
     return next(new ClientErrorBadRequest());
@@ -25,15 +26,15 @@ export const addLike = handler(async (req, res, next) => {
   await gif.save();
   await gif.populate(`likes.${position - 1}.user`, 'username').execPopulate();
 
-  return res.send(gif!.likes[position - 1]);
+  res.send(gif.likes[position - 1]);
 });
 
 export const removeLike = handler(async (req, res, next) => {
-  const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
+  const gif = ((req as unknown) as RequestWithGif).gif;
+  const userId = ((req as unknown) as RequestWithJwtToken).authUser.id;
 
   // Check if the gif is already liked by current user
-  const like = gif.likes.find((l) => (l.user as IUser)._id.equals(userId));
+  const like = gif.likes.find((l: Like) => (l.user as User)._id.equals(userId));
 
   if (!like) {
     return next(new ClientErrorBadRequest());
@@ -44,5 +45,5 @@ export const removeLike = handler(async (req, res, next) => {
 
   await gif.save();
 
-  return res.send();
+  res.send();
 });

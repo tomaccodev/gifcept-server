@@ -1,6 +1,7 @@
-import { Request } from 'express';
-import { DocumentQuery, Types } from 'mongoose';
 import { basename, extname, join } from 'path';
+
+import { Request } from 'express';
+import { Document, DocumentQuery, Types } from 'mongoose';
 import { v4 } from 'uuid';
 
 import config from '../../../../config.json';
@@ -9,19 +10,19 @@ import {
   ServerErrorInternalServerError,
 } from '../../../error/httpException';
 import { handler } from '../../../helpers/express';
-import { IRequestWithJwtToken } from '../../../middleware/express/jwtAuth';
+import { RequestWithJwtToken } from '../../../middleware/express/jwtAuth';
 import { Rating } from '../../../models/common/constants';
-import Gif, { IGif } from '../../../models/gif';
-import GifFile, { IGifFile } from '../../../models/gifFile';
-import User from '../../../models/user';
+import GifModel, { Gif } from '../../../models/gif';
+import GifFileModel, { GifFile } from '../../../models/gifFile';
+import UserModel from '../../../models/user';
 import { downloadFile } from '../../../utils/download';
 import { getFileSize, md5hash, move, remove } from '../../../utils/files';
 import { getImagePredominantHexColor, getSize, saveFrameFromGif } from '../../../utils/images';
-import { IRequestWithGif } from '../../common/handlers/gifs';
-import { IRequestWithUser } from '../../common/handlers/users';
-import { IRequestWithTag } from '../tags/handlers';
+import { RequestWithGif } from '../../common/handlers/gifs';
+import { RequestWithUser } from '../../common/handlers/users';
+import { RequestWithTag } from '../tags/handlers';
 
-interface IGifSimpleQuery {
+interface GifSimpleQuery {
   _id?: {
     $lt: string;
   };
@@ -37,11 +38,16 @@ interface IGifSimpleQuery {
   rating?: Rating;
 }
 
-const queryFromReq = (req: Request) => {
-  const query: IGifSimpleQuery = {};
+type GifQuery =
+  | GifSimpleQuery
+  | { $or: GifSimpleQuery[] }
+  | { $and: (GifSimpleQuery | { $or: GifSimpleQuery[] })[] };
 
-  if ((req as IRequestWithUser).user) {
-    query.user = (req as IRequestWithUser).user._id;
+const queryFromReq = (req: Request): GifQuery => {
+  const query: GifSimpleQuery = {};
+
+  if ((req as RequestWithUser).user) {
+    query.user = (req as RequestWithUser).user._id;
   }
   if (req.query.before) {
     query._id = { $lt: req.query.before };
@@ -49,9 +55,9 @@ const queryFromReq = (req: Request) => {
   if (req.query.rating) {
     query.rating = req.query.rating;
   }
-  if ((req as IRequestWithTag).tag) {
+  if ((req as RequestWithTag).tag) {
     query.tags = {
-      $regex: new RegExp(`^${(req as IRequestWithTag).tag}$`),
+      $regex: new RegExp(`^${(req as RequestWithTag).tag}$`),
       $options: 'i',
     };
   }
@@ -77,32 +83,42 @@ const queryFromReq = (req: Request) => {
   }
 };
 
-const normalize = (toNormalize: DocumentQuery<IGif[] | IGif, any> | IGif) => {
+interface MightHaveExecPopulate {
+  execPopulate?: () => Promise<Gif>;
+}
+
+const normalize = (
+  toNormalize: DocumentQuery<Gif[] | Gif, Document> | Gif,
+): Promise<Gif> | Gif | DocumentQuery<Gif[] | Gif, Document> => {
   const normalizedValue = toNormalize
     .populate('user', 'username')
     .populate('likes.user', 'username')
     .populate('comments.user', 'username')
     .populate('shares.user', 'username');
 
-  return (normalizedValue as any).execPopulate
-    ? (normalizedValue as IGif).execPopulate()
+  return (normalizedValue as MightHaveExecPopulate).execPopulate
+    ? (normalizedValue as Gif).execPopulate()
     : normalizedValue;
 };
 
-export const getGifs = handler(async (req, res, next) => {
+export const getGifs = handler(async (req, res) => {
   const gifs = await normalize(
-    Gif.find(queryFromReq(req), null, {
+    GifModel.find(queryFromReq(req), null, {
       sort: {
         created: -1,
       },
     }).limit(config.pageSizes.gifs),
   );
 
-  return res.send(gifs);
+  res.send(gifs);
 });
 
-const findOrCreateGifFile = async (tempPath: string, md5checksum: string, url?: string) => {
-  let gifFile = await GifFile.findOne({ md5checksum });
+const findOrCreateGifFile = async (
+  tempPath: string,
+  md5checksum: string,
+  url?: string,
+): Promise<GifFile> => {
+  let gifFile = await GifFileModel.findOne({ md5checksum });
 
   if (!gifFile) {
     const { width, height } = await getSize(tempPath);
@@ -116,7 +132,7 @@ const findOrCreateGifFile = async (tempPath: string, md5checksum: string, url?: 
     if (url) {
       importationUrls.push({ url });
     }
-    gifFile = await GifFile.create({
+    gifFile = await GifFileModel.create({
       md5checksum,
       width,
       height,
@@ -141,25 +157,25 @@ const findOrCreateGifFile = async (tempPath: string, md5checksum: string, url?: 
   return gifFile;
 };
 
-const findOrCreateGifFileByUrl = async (url: string) => {
+const findOrCreateGifFileByUrl = async (url: string): Promise<GifFile> => {
   const tempPath = join(config.dirs.uploadDir, `${v4()}.gif`);
   const md5checksum = await downloadFile(url, tempPath);
 
   return await findOrCreateGifFile(tempPath, md5checksum, url);
 };
 
-const findOrCreateGifFileByUpload = async (file: Express.Multer.File) => {
+const findOrCreateGifFileByUpload = async (file: Express.Multer.File): Promise<GifFile> => {
   const tempPath = file.path;
   const md5checksum = await md5hash(tempPath);
 
   return await findOrCreateGifFile(tempPath, md5checksum);
 };
 
-const addGif = async (gifFile: IGifFile, userId: string) => {
-  return await Gif.create({
+const addGif = async (gifFile: GifFile, userId: string): Promise<Gif> => {
+  return await GifModel.create({
     gifFile,
     color: gifFile.color,
-    user: await User.findById(userId),
+    user: await UserModel.findById(userId),
     height: gifFile.height,
     width: gifFile.width,
   });
@@ -172,8 +188,8 @@ export const addGifByUrl = handler(async (req, res, next) => {
     return next(new ServerErrorInternalServerError());
   }
 
-  return res.send(
-    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).authUser.id)),
+  res.send(
+    await normalize(await addGif(gifFile, ((req as unknown) as RequestWithJwtToken).authUser.id)),
   );
 });
 
@@ -187,13 +203,13 @@ export const addGifByUpload = handler(async (req, res, next) => {
     return next(new ServerErrorInternalServerError());
   }
 
-  return res.send(
-    await normalize(await addGif(gifFile, ((req as unknown) as IRequestWithJwtToken).authUser.id)),
+  res.send(
+    await normalize(await addGif(gifFile, ((req as unknown) as RequestWithJwtToken).authUser.id)),
   );
 });
 
-export const updateGif = handler(async (req, res, next) => {
-  const gif = (req as IRequestWithGif).gif;
+export const updateGif = handler(async (req, res) => {
+  const gif = (req as RequestWithGif).gif;
 
   if (req.body.description) {
     gif.description = req.body.description;
@@ -208,13 +224,13 @@ export const updateGif = handler(async (req, res, next) => {
   await gif.save();
   await normalize(gif);
 
-  return res.send(gif);
+  res.send(gif);
 });
 
-export const deleteGif = handler(async (req, res, next) => {
-  const gif = (req as IRequestWithGif).gif;
+export const deleteGif = handler(async (req, res) => {
+  const gif = (req as RequestWithGif).gif;
 
   await gif.remove();
 
-  return res.send();
+  res.send();
 });

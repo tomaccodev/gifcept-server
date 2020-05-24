@@ -2,11 +2,11 @@ import { createHash } from 'crypto';
 import { createWriteStream, unlink } from 'fs';
 import { get as httpGet } from 'http';
 import { get as httpsGet } from 'https';
-import { parse } from 'url';
+import { URL } from 'url';
 
 export const downloadFile: (url: string, dest: string) => Promise<string> = async (url, dest) =>
   new Promise((acc, rej) => {
-    const { protocol } = parse(url);
+    const { protocol } = new URL(url);
 
     const get = protocol === 'https:' ? httpsGet : httpGet;
     const file = createWriteStream(dest);

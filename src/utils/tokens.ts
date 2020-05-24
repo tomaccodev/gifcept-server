@@ -1,9 +1,9 @@
 import { sign } from 'jsonwebtoken';
 
 import config from '../../config.json';
-import { IUser } from '../models/user';
+import { User } from '../models/user';
 
-export const generateToken = (user: IUser) =>
+export const generateToken = (user: User): Promise<string> =>
   new Promise((res, rej) => {
     sign(
       {

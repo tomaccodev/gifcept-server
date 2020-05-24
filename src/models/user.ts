@@ -1,15 +1,15 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
 
-import email, { IWithEmail } from '../middleware/mongoose/email';
-import password, { IWithPassword } from '../middleware/mongoose/password';
-import timestamps, { IWithCreated, IWithUpdated } from '../middleware/mongoose/timestamps';
+import email, { WithEmail } from '../middleware/mongoose/email';
+import password, { WithPassword } from '../middleware/mongoose/password';
+import timestamps, { WithCreated, WithUpdated } from '../middleware/mongoose/timestamps';
 
 export enum Role {
   user = 'user',
   admin = 'admin',
 }
 
-export interface IUser extends Document, IWithEmail, IWithPassword, IWithCreated, IWithUpdated {
+export interface User extends Document, WithEmail, WithPassword, WithCreated, WithUpdated {
   username: string;
   role: Role;
   comparePassword: (password: string) => Promise<boolean>;
@@ -40,4 +40,4 @@ UserSchema.set('toJSON', {
   virtuals: true,
 });
 
-export default model<IUser>('User', UserSchema);
+export default model<User>('User', UserSchema);

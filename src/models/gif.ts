@@ -1,16 +1,16 @@
-import { Document, model, Schema, Types } from 'mongoose';
+import { Document, Schema, Types, model } from 'mongoose';
 
-import comments, { IWithComments } from '../middleware/mongoose/comments';
+import comments, { WithComments } from '../middleware/mongoose/comments';
 import normalizeJSON from '../middleware/mongoose/normalizeJSON';
-import owner, { IWithOwner } from '../middleware/mongoose/owner';
+import owner, { WithOwner } from '../middleware/mongoose/owner';
 import shortId from '../middleware/mongoose/shortId';
-import timestamps, { IWithCreated, IWithUpdated } from '../middleware/mongoose/timestamps';
+import timestamps, { WithCreated, WithUpdated } from '../middleware/mongoose/timestamps';
 
 import { Rating } from './common/constants';
-import { IGifFile } from './gifFile';
-import { IUser } from './user';
+import { GifFile } from './gifFile';
+import { User } from './user';
 
-export interface ILike extends IWithCreated, IWithOwner<IUser> {}
+export interface Like extends WithCreated, WithOwner<User> {}
 
 const LikeSchema = new Schema({})
   .plugin(owner)
@@ -20,8 +20,8 @@ const LikeSchema = new Schema({})
     virtuals: true,
   });
 
-export interface IShare extends IWithCreated, IWithOwner<IUser> {
-  gif: IGif;
+export interface Share extends WithCreated, WithOwner<User> {
+  gif: Gif;
 }
 
 const ShareSchema = new Schema({
@@ -39,13 +39,13 @@ ShareSchema.set('toJSON', {
   virtuals: true,
 });
 
-export interface IGif
+export interface Gif
   extends Document,
-    IWithOwner<IUser>,
-    IWithComments<IUser>,
-    IWithCreated,
-    IWithUpdated {
-  gifFile: IGifFile;
+    WithOwner<User>,
+    WithComments<User>,
+    WithCreated,
+    WithUpdated {
+  gifFile: GifFile;
   width: number;
   height: number;
   color: string;
@@ -53,9 +53,9 @@ export interface IGif
   rating: Rating;
   viewsCount: number;
   tags: string[];
-  likes: Types.DocumentArray<ILike>;
+  likes: Types.DocumentArray<Like>;
   likesCount: number;
-  shares: Types.DocumentArray<IShare>;
+  shares: Types.DocumentArray<Share>;
   sharesCount: number;
   commentsCount: number;
 }
@@ -78,7 +78,7 @@ const GifSchema = new Schema(
     color: {
       type: String,
       required: true,
-      validate: [(v) => v.match(/^#[\da-f]{6}$/i), 'Invalid color'],
+      validate: [(v): boolean => v.match(/^#[\da-f]{6}$/i), 'Invalid color'],
     },
     description: {
       type: String,
@@ -145,4 +145,4 @@ const GifSchema = new Schema(
     virtuals: true,
   });
 
-export default model<IGif>('Gif', GifSchema);
+export default model<Gif>('Gif', GifSchema);

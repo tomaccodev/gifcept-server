@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 
-export interface INormalizeJSONOptions {
+export interface NormalizeJSONOptions {
   rename?: {
     [key: string]: string;
   };
@@ -15,11 +15,11 @@ export interface INormalizeJSONOptions {
  */
 export default (
   schema: Schema,
-  { rename = {}, remove = ['__v'], virtuals = true }: INormalizeJSONOptions = {},
-) => {
+  { rename = {}, remove = ['__v'], virtuals = true }: NormalizeJSONOptions = {},
+): void => {
   schema.set('toJSON', {
     virtuals,
-    transform: (doc, json) => {
+    transform: (_, json) => {
       // handle renames
       for (const [from, to] of Object.entries(rename)) {
         const parts = from.split('.');

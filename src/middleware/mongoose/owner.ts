@@ -1,10 +1,10 @@
 import { Document, Schema, Types } from 'mongoose';
 
-export interface IWithOwner<T> extends Document {
+export interface WithOwner<T> extends Document {
   user: T | Types.ObjectId;
 }
 
-export interface IOwnerMiddlewareOptions {
+export interface OwnerMiddlewareOptions {
   field?: string;
   required?: boolean;
   ref?: string;
@@ -20,8 +20,8 @@ export interface IOwnerMiddlewareOptions {
  */
 export default (
   schema: Schema,
-  { field = 'user', required = true, ref = 'User', index = true }: IOwnerMiddlewareOptions = {},
-) => {
+  { field = 'user', required = true, ref = 'User', index = true }: OwnerMiddlewareOptions = {},
+): void => {
   schema.add({
     [field]: {
       type: Types.ObjectId,

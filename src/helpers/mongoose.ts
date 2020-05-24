@@ -1,9 +1,10 @@
-import { connect, Mongoose } from 'mongoose';
-let connectionPromise: Promise<Mongoose>;
+import { Mongoose, connect } from 'mongoose';
 
 import config from '../../config.json';
 
-export default () => {
+let connectionPromise: Promise<Mongoose>;
+
+export default (): Promise<Mongoose> => {
   if (connectionPromise === undefined) {
     connectionPromise = connect(
       `mongodb://${config.mongodb.host}:${config.mongodb.port}/${config.mongodb.database}`,

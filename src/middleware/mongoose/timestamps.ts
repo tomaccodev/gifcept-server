@@ -1,14 +1,14 @@
 import { Document, Schema } from 'mongoose';
 
-export interface IWithCreated extends Document {
+export interface WithCreated extends Document {
   created: Date;
 }
 
-export interface IWithUpdated extends Document {
+export interface WithUpdated extends Document {
   updated?: Date;
 }
 
-export interface ITimestampsMiddlewareOptions {
+export interface TimestampsMiddlewareOptions {
   creation?: boolean;
   update?: boolean;
   creationField?: string;
@@ -38,8 +38,8 @@ export default (
     indexCreation = false,
     indexUpdate = false,
     updateTimestampOnCreation = false,
-  }: ITimestampsMiddlewareOptions = {},
-) => {
+  }: TimestampsMiddlewareOptions = {},
+): void => {
   if (creation) {
     schema.add({ [creationField]: Date });
   }

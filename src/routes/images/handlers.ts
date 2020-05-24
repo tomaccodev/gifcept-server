@@ -2,10 +2,10 @@ import { extname, join } from 'path';
 
 import config from '../../../config.json';
 import { handler } from '../../helpers/express';
-import { IRequestWithGif } from '../common/handlers/gifs';
+import { RequestWithGif } from '../common/handlers/gifs';
 
-export const serveImage = handler(async (req, res, next) => {
-  const gif = ((req as unknown) as IRequestWithGif).gif;
+export const serveImage = handler(async (req, res) => {
+  const gif = ((req as unknown) as RequestWithGif).gif;
 
   await gif.populate('gifFile');
 

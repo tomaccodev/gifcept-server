@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { ClientErrorUnauthorized } from '../../../error/httpException';
-import { IRequestWithJwtToken } from '../../../middleware/express/jwtAuth';
-import { IRequestWithGif } from '../handlers/gifs';
+import { RequestWithJwtToken } from '../../../middleware/express/jwtAuth';
+import { RequestWithGif } from '../handlers/gifs';
 
-export const ownedByUser = (req: Request, res: Response, next: NextFunction) => {
-  const userId = (req as IRequestWithJwtToken).authUser.id;
-  const gif = (req as IRequestWithGif).gif;
+export const ownedByUser = (req: Request, _: Response, next: NextFunction): void => {
+  const userId = (req as RequestWithJwtToken).authUser.id;
+  const gif = (req as RequestWithGif).gif;
 
   if (userId !== gif.user.toString()) {
     return next(new ClientErrorUnauthorized());
   }
-  return next();
+  next();
 };

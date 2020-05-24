@@ -1,10 +1,10 @@
-import { Document, model, Schema, Types } from 'mongoose';
+import { Document, Schema, Types, model } from 'mongoose';
 
-import timestamps, { IWithCreated, IWithUpdated } from '../middleware/mongoose/timestamps';
+import timestamps, { WithCreated, WithUpdated } from '../middleware/mongoose/timestamps';
 
 import { Rating } from './common/constants';
 
-export interface IImportationUrl extends Document, IWithCreated {
+export interface ImportationUrl extends Document, WithCreated {
   url: string;
   created: Date;
 }
@@ -19,14 +19,14 @@ const ImportationUrlSchema = new Schema(
   { _id: false },
 ).plugin(timestamps, { update: false });
 
-export interface IGifFile extends Document, IWithCreated, IWithUpdated {
+export interface GifFile extends Document, WithCreated, WithUpdated {
   md5checksum: string;
   width: number;
   height: number;
   color: string;
   fileSize: number;
   frameFileSize: number;
-  importationUrls: Types.DocumentArray<IImportationUrl>;
+  importationUrls: Types.DocumentArray<ImportationUrl>;
   moderatedRating: Rating;
 }
 
@@ -48,7 +48,7 @@ const GifFileSchema = new Schema(
     color: {
       type: String,
       required: true,
-      validate: [(v) => v.match(/^#[\da-f]{6}$/i), 'Invalid color'],
+      validate: [(v): boolean => v.match(/^#[\da-f]{6}$/i), 'Invalid color'],
     },
     fileSize: {
       type: Number,
@@ -70,4 +70,4 @@ const GifFileSchema = new Schema(
   { collection: 'gifFiles' },
 ).plugin(timestamps);
 
-export default model<IGifFile>('GifFile', GifFileSchema);
+export default model<GifFile>('GifFile', GifFileSchema);

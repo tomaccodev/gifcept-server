@@ -2,20 +2,20 @@ import { Types } from 'mongoose';
 
 import { ClientErrorNotFound, ClientErrorUnauthorized } from '../../../../error/httpException';
 import { handler } from '../../../../helpers/express';
-import { IRequestWithJwtToken } from '../../../../middleware/express/jwtAuth';
-import { IRequestWithGif } from '../../../common/handlers/gifs';
+import { RequestWithJwtToken } from '../../../../middleware/express/jwtAuth';
+import { RequestWithGif } from '../../../common/handlers/gifs';
 
-export const getGifComments = handler(async (req, res, next) => {
-  const gif = ((req as unknown) as IRequestWithGif).gif;
+export const getGifComments = handler(async (req, res) => {
+  const gif = ((req as unknown) as RequestWithGif).gif;
 
   await gif.populate('comments.author').execPopulate();
 
-  return res.send(gif.comments);
+  res.send(gif.comments);
 });
 
-export const addComment = handler(async (req, res, next) => {
-  const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
+export const addComment = handler(async (req, res) => {
+  const gif = ((req as unknown) as RequestWithGif).gif;
+  const userId = ((req as unknown) as RequestWithJwtToken).authUser.id;
 
   gif.comments.push({
     text: req.body.comment.trim(),
@@ -30,14 +30,12 @@ export const addComment = handler(async (req, res, next) => {
 
   const comment = gif.comments[commentIndex];
 
-  return res.send(comment);
-
-  return res.send();
+  res.send(comment);
 });
 
 export const removeComment = handler(async (req, res, next) => {
-  const gif = ((req as unknown) as IRequestWithGif).gif;
-  const userId = ((req as unknown) as IRequestWithJwtToken).authUser.id;
+  const gif = ((req as unknown) as RequestWithGif).gif;
+  const userId = ((req as unknown) as RequestWithJwtToken).authUser.id;
 
   const comment = gif.comments.id(req.params.id);
 
@@ -53,5 +51,5 @@ export const removeComment = handler(async (req, res, next) => {
   gif.commentsCount = gif.comments.length;
   await gif.save();
 
-  return res.send();
+  res.send();
 });

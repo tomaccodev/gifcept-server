@@ -1,14 +1,15 @@
-import gm, { Dimensions } from 'gm';
 import { PassThrough } from 'stream';
 import { promisify } from 'util';
 
-export const getSize = (pathToFile: string) => {
+import gm, { Dimensions } from 'gm';
+
+export const getSize = (pathToFile: string): Promise<Dimensions> => {
   const image = gm(pathToFile);
 
   return promisify<Dimensions>(image.size.bind(image))();
 };
 
-export const getImagePredominantHexColor = async (pathToFile: string) =>
+export const getImagePredominantHexColor = async (pathToFile: string): Promise<string> =>
   new Promise<string>((res, rej) => {
     gm(pathToFile)
       .resize(1, 1)
@@ -44,8 +45,8 @@ export const getImagePredominantHexColor = async (pathToFile: string) =>
       });
   });
 
-export const saveFrameFromGif = (src: string, dest: string) => {
+export const saveFrameFromGif = async (src: string, dest: string): Promise<void> => {
   const image = gm(`${src}[0]`).noProfile();
 
-  return promisify(image.write.bind(image))(dest);
+  await promisify(image.write.bind(image))(dest);
 };

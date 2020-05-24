@@ -1,55 +1,56 @@
-// tslint:disable:no-console
-import mysql, { Connection } from 'mysql2/promise';
 import { join } from 'path';
+
+import { Mongoose } from 'mongoose';
+import mysql, { Connection, FieldPacket, RowDataPacket } from 'mysql2/promise';
 import { v4 } from 'uuid';
 
 import config from '../../config.json';
 import connectMongoose from '../helpers/mongoose';
 import { Rating } from '../models/common/constants';
-import Gif, { IGif } from '../models/gif';
-import GifFile, { IGifFile } from '../models/gifFile';
-import User, { IUser, Role } from '../models/user';
+import GifModel, { Gif } from '../models/gif';
+import GifFileModel, { GifFile } from '../models/gifFile';
+import UserModel, { Role, User } from '../models/user';
 import { copy } from '../utils/files';
 import { getImagePredominantHexColor, saveFrameFromGif } from '../utils/images';
 
-interface IMysqlModel {
+interface MysqlModel {
   id: number;
 }
 
-interface IMysqlWithTimestamps {
+interface MysqlWithTimestamps {
   created_at: string;
   updated_at: string;
 }
 
-interface IMysqlUser extends IMysqlModel, IMysqlWithTimestamps {
+interface MysqlUser extends MysqlModel, MysqlWithTimestamps {
   id: number;
   username: string;
   email: string;
   role: Role;
 }
 
-interface IMysqlGifImportationUrl {
+interface MysqlGifImportationUrl {
   url: string;
   created_at: string;
 }
 
-interface IMysqlGifLike {
+interface MysqlGifLike {
   user_id: number;
   created_at: string;
 }
 
-interface IMysqlGifComment {
+interface MysqlGifComment {
   user_id: number;
   comment: string;
   created_at: string;
   updated_at: string;
 }
 
-interface IMysqlGifTag {
+interface MysqlGifTag {
   name: string;
 }
 
-interface IMysqlGifFile extends IMysqlModel, IMysqlWithTimestamps {
+interface MysqlGifFile extends MysqlModel, MysqlWithTimestamps {
   sguid: string;
   md5checksum: string;
   width: number;
@@ -58,7 +59,7 @@ interface IMysqlGifFile extends IMysqlModel, IMysqlWithTimestamps {
   static_size: number;
 }
 
-interface IMysqlGif extends IMysqlModel, IMysqlWithTimestamps {
+interface MysqlGif extends MysqlModel, MysqlWithTimestamps {
   gif_id: number;
   user_id: number;
   sguid: string;
@@ -67,24 +68,32 @@ interface IMysqlGif extends IMysqlModel, IMysqlWithTimestamps {
   views: number;
 }
 
-const users: { [key: number]: IUser } = {};
-const gifFiles: { [key: number]: IGifFile } = {};
-const gifs: { [key: number]: IGif } = {};
+const users: { [key: number]: User } = {};
+const gifFiles: { [key: number]: GifFile } = {};
+const gifs: { [key: number]: Gif } = {};
 
 let mysqlConnection: Connection;
+let mongooseConnection: Mongoose;
 
-const query = (queryString: string) => mysqlConnection.query(queryString);
+const query = (
+  queryString: string,
+): Promise<[RowDataPacket[][] | RowDataPacket[], FieldPacket[]]> =>
+  mysqlConnection.query(queryString);
 
-const connectMysql = () =>
+const connectMysql = (): Promise<Connection> =>
   mysql.createConnection({
     ...config.mysql,
   });
 
-const removeData = () =>
-  Promise.all([User.remove({}).exec(), GifFile.remove({}).exec(), Gif.remove({}).exec()]);
+const removeData = (): Promise<unknown> =>
+  Promise.all([
+    UserModel.remove({}).exec(),
+    GifFileModel.remove({}).exec(),
+    GifModel.remove({}).exec(),
+  ]);
 
-const importUser = async (mysqlUser: IMysqlUser) => {
-  users[mysqlUser.id] = await User.create({
+const importUser = async (mysqlUser: MysqlUser): Promise<void> => {
+  users[mysqlUser.id] = await UserModel.create({
     username: mysqlUser.username,
     email: mysqlUser.email,
     role: mysqlUser.role,
@@ -97,7 +106,7 @@ const importUser = async (mysqlUser: IMysqlUser) => {
   });
 };
 
-const importGifFile = async (mysqlGif: IMysqlGifFile) => {
+const importGifFile = async (mysqlGif: MysqlGifFile): Promise<void> => {
   const [urls] = await query(`
     SELECT gif_importation_urls.url, gif_importation_urls.created_at
     FROM gif_importation_urls
@@ -125,14 +134,14 @@ const importGifFile = async (mysqlGif: IMysqlGifFile) => {
       console.log(`Color was falsy for gif ${gifPath}`);
     }
 
-    const createdGif = await GifFile.create({
+    const createdGif = await GifFileModel.create({
       md5checksum: mysqlGif.md5checksum,
       width: mysqlGif.width,
       height: mysqlGif.height,
       color,
       fileSize: mysqlGif.animation_size,
       frameFileSize: mysqlGif.static_size,
-      importationUrls: (urls as IMysqlGifImportationUrl[]).map((u) => ({
+      importationUrls: (urls as MysqlGifImportationUrl[]).map((u) => ({
         url: u.url,
         created: `${u.created_at}Z`,
       })),
@@ -149,7 +158,7 @@ const importGifFile = async (mysqlGif: IMysqlGifFile) => {
   }
 };
 
-const importGif = async (mysqlGif: IMysqlGif) => {
+const importGif = async (mysqlGif: MysqlGif): Promise<void> => {
   if (!gifFiles[mysqlGif.gif_id]) {
     return;
   }
@@ -180,7 +189,7 @@ const importGif = async (mysqlGif: IMysqlGif) => {
     tagsPromise,
   ]);
 
-  await Gif.create({
+  await GifModel.create({
     gifFile: gifFiles[mysqlGif.gif_id],
     user: users[mysqlGif.user_id],
     shortId: mysqlGif.sguid,
@@ -192,25 +201,25 @@ const importGif = async (mysqlGif: IMysqlGif) => {
     views: mysqlGif.views,
     created: `${mysqlGif.created_at}Z`,
     updated: mysqlGif.created_at !== mysqlGif.updated_at ? `${mysqlGif.updated_at}Z` : null,
-    likes: (likes as IMysqlGifLike[]).map((l) => ({
+    likes: (likes as MysqlGifLike[]).map((l) => ({
       user: users[l.user_id],
       created: `${l.created_at}Z`,
     })),
-    likesCount: (likes as IMysqlGifLike[]).length,
-    comments: (comments as IMysqlGifComment[]).map((c) => ({
+    likesCount: (likes as MysqlGifLike[]).length,
+    comments: (comments as MysqlGifComment[]).map((c) => ({
       user: users[c.user_id],
       text: c.comment,
       created: `${c.created_at}Z`,
       updated: c.created_at !== c.updated_at ? `${c.updated_at}Z` : null,
     })),
-    commentsCount: (comments as IMysqlGifComment[]).length,
-    tags: (tags as IMysqlGifTag[]).map((t) => t.name),
+    commentsCount: (comments as MysqlGifComment[]).length,
+    tags: (tags as MysqlGifTag[]).map((t) => t.name),
   }).then((createdGif) => {
     gifs[mysqlGif.id] = createdGif;
   });
 };
 
-const importUsers = async () => {
+const importUsers = async (): Promise<void> => {
   const [mysqlUsers] = await query(`
     SELECT users.*, IF(ISNULL(roles.name), 'user', roles.name) as role
       FROM users
@@ -221,16 +230,16 @@ const importUsers = async () => {
   let usersCount = 0;
 
   await Promise.all(
-    (mysqlUsers as IMysqlUser[]).map((mysqlUser) =>
+    (mysqlUsers as MysqlUser[]).map((mysqlUser) =>
       importUser(mysqlUser).then(() => {
         usersCount += 1;
-        console.log(`Created user ${usersCount}/${(mysqlUsers as IMysqlUser[]).length}`);
+        console.log(`Created user ${usersCount}/${(mysqlUsers as MysqlUser[]).length}`);
       }),
     ),
   );
 };
 
-const importGifFiles = async () => {
+const importGifFiles = async (): Promise<void> => {
   const [mysqlGifFiles] = await query(`
     SELECT gifs.*
       FROM gifs
@@ -239,18 +248,16 @@ const importGifFiles = async () => {
   let gifFilesCount = 0;
 
   await Promise.all(
-    (mysqlGifFiles as IMysqlGifFile[]).map((gif) =>
+    (mysqlGifFiles as MysqlGifFile[]).map((gif) =>
       importGifFile(gif).then(() => {
         gifFilesCount += 1;
-        console.log(
-          `Created gifFile ${gifFilesCount}/${(mysqlGifFiles as IMysqlGifFile[]).length}`,
-        );
+        console.log(`Created gifFile ${gifFilesCount}/${(mysqlGifFiles as MysqlGifFile[]).length}`);
       }),
     ),
   );
 };
 
-const importGifs = async () => {
+const importGifs = async (): Promise<void> => {
   const [mysqlGifs] = await query(`
     SELECT user_gifs.*
       FROM user_gifs
@@ -259,22 +266,23 @@ const importGifs = async () => {
   let gifsCount = 0;
 
   await Promise.all(
-    (mysqlGifs as IMysqlGif[]).map((gif) =>
+    (mysqlGifs as MysqlGif[]).map((gif) =>
       importGif(gif).then(() => {
         gifsCount += 1;
-        console.log(`Created gif ${gifsCount}/${(mysqlGifs as IMysqlGif[]).length}`);
+        console.log(`Created gif ${gifsCount}/${(mysqlGifs as MysqlGif[]).length}`);
       }),
     ),
   );
 };
 
-const importData = async () => {
-  [mysqlConnection] = await Promise.all([connectMysql(), connectMongoose()]);
+const importData = async (): Promise<void> => {
+  [mysqlConnection, mongooseConnection] = await Promise.all([connectMysql(), connectMongoose()]);
   await removeData();
   await Promise.all([importUsers(), importGifFiles()]);
   await importGifs();
 
-  process.exit();
+  await mongooseConnection.disconnect();
+  mysqlConnection.destroy();
 };
 
 importData();

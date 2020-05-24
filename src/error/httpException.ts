@@ -1,22 +1,22 @@
-interface IOptionaExceptionParams {
-  debug?: any;
+interface OptionaExceptionParams {
+  debug?: Record<string, unknown>;
   message?: string;
 }
 
 export abstract class HttpException extends Error {
-  constructor(
+  protected constructor(
     public statusCode: number,
     public message: string,
-    public optionalParams: IOptionaExceptionParams = {},
+    public optionalParams: OptionaExceptionParams = {},
   ) {
     super(message);
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const generateHttpStatusCodeError = (statusCode: number, message: string) =>
-  // tslint:disable-next-line:max-classes-per-file
   class StatusCodeError extends HttpException {
-    constructor(optionalParams: IOptionaExceptionParams = {}) {
+    constructor(optionalParams: OptionaExceptionParams = {}) {
       super(statusCode, optionalParams.message ? optionalParams.message : message, optionalParams);
     }
   };

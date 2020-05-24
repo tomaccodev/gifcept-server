@@ -1,10 +1,10 @@
 import { handler } from '../../../helpers/express';
-import { IRequestWithJwtToken } from '../../../middleware/express/jwtAuth';
-import Gif from '../../../models/gif';
+import { RequestWithJwtToken } from '../../../middleware/express/jwtAuth';
+import GifModel from '../../../models/gif';
 
-export const getUserTags = handler(async (req, res, next) => {
-  const userGifs = await Gif.find({
-    user: (req as IRequestWithJwtToken).authUser.id,
+export const getUserTags = handler(async (req, res) => {
+  const userGifs = await GifModel.find({
+    user: (req as RequestWithJwtToken).authUser.id,
   });
 
   const tags: string[] = [];

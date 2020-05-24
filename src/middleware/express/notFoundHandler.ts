@@ -1,7 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-
 import { ClientErrorNotFound } from '../../error/httpException';
 
-export default (request: Request, response: Response, next: NextFunction) => {
+export default (): void => {
   throw new ClientErrorNotFound();
 };

@@ -2,14 +2,14 @@ import { Request } from 'express';
 
 import { ClientErrorNotFound } from '../../../error/httpException';
 import { paramHandler } from '../../../helpers/express';
-import User, { IUser } from '../../../models/user';
+import UserModel, { User } from '../../../models/user';
 
-export interface IRequestWithUser extends Request {
-  user: IUser;
+export interface RequestWithUser extends Request {
+  user: User;
 }
 
-export const userByUsername = paramHandler(async (req, res, next, id) => {
-  const user = await User.findOne({
+export const userByUsername = paramHandler(async (req, _, next, id) => {
+  const user = await UserModel.findOne({
     username: id,
   });
 
@@ -17,6 +17,6 @@ export const userByUsername = paramHandler(async (req, res, next, id) => {
     return next(new ClientErrorNotFound());
   }
 
-  ((req as unknown) as IRequestWithUser).user = user;
-  return next();
+  ((req as unknown) as RequestWithUser).user = user;
+  next();
 });

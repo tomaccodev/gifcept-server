@@ -1,7 +1,7 @@
 import { Document, Schema } from 'mongoose';
 import { generate } from 'shortid';
 
-export interface IWithShortId extends Document {
+export interface WithShortId extends Document {
   shortId: string;
 }
 
@@ -20,7 +20,7 @@ interface ShortIdMiddleware {
 export default (
   schema: Schema,
   { field = 'shortId', required = true, index = true }: ShortIdMiddleware = {},
-) => {
+): void => {
   schema.add({
     [field]: {
       type: String,

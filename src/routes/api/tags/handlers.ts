@@ -3,15 +3,15 @@ import { Request } from 'express';
 import { ClientErrorBadRequest } from '../../../error/httpException';
 import { paramHandler } from '../../../helpers/express';
 
-export interface IRequestWithTag extends Request {
+export interface RequestWithTag extends Request {
   tag: string;
 }
 
-export const byTag = paramHandler(async (req, res, next, tag) => {
+export const byTag = paramHandler(async (req, _, next, tag) => {
   if (!tag) {
     return next(new ClientErrorBadRequest());
   }
 
-  ((req as unknown) as IRequestWithTag).tag = tag;
-  return next();
+  ((req as unknown) as RequestWithTag).tag = tag;
+  next();
 });

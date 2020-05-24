@@ -1,30 +1,29 @@
 import { Document, DocumentToObjectOptions, Schema, Types } from 'mongoose';
 
-import ownerPlugin, { IOwnerMiddlewareOptions } from './owner';
+import ownerPlugin, { OwnerMiddlewareOptions } from './owner';
 import timestampsPlugin, {
-  ITimestampsMiddlewareOptions,
-  IWithCreated,
-  IWithUpdated,
+  TimestampsMiddlewareOptions,
+  WithCreated,
+  WithUpdated,
 } from './timestamps';
 
-interface IComment<T> extends IWithCreated, IWithUpdated {
+interface Comment<T> extends WithCreated, WithUpdated {
   user: T | Types.ObjectId;
   text: string;
 }
 
-export interface IWithComments<T> extends Document {
-  comments: Types.DocumentArray<IComment<T>>;
+export interface WithComments<T> extends Document {
+  comments: Types.DocumentArray<Comment<T>>;
 }
 
-interface ICommentsMiddlewareOptions {
+interface CommentsMiddlewareOptions {
   field?: string;
   required?: boolean;
   multiple?: boolean;
-  defaultValue?: any;
   author?: boolean;
-  authorOptions?: IOwnerMiddlewareOptions;
+  authorOptions?: OwnerMiddlewareOptions;
   timestamps?: boolean;
-  timestampsOptions?: ITimestampsMiddlewareOptions;
+  timestampsOptions?: TimestampsMiddlewareOptions;
   toJsonOptions?: DocumentToObjectOptions;
 }
 
@@ -33,7 +32,6 @@ interface ICommentsMiddlewareOptions {
  * @param {string} field
  * @param {boolean} required
  * @param {boolean} multiple
- * @param {*} defaultValue
  * @param {boolean} author
  * @param {object} authorOptions
  * @param {boolean} timestamps
@@ -46,14 +44,13 @@ export default (
     field = 'comments',
     required = false,
     multiple = true,
-    defaultValue = multiple ? [] : null,
     author = true,
     authorOptions = { field: 'user' },
     timestamps = true,
     timestampsOptions = {},
     toJsonOptions = { virtuals: true },
-  }: ICommentsMiddlewareOptions = {},
-) => {
+  }: CommentsMiddlewareOptions = {},
+): void => {
   const commentSchema = new Schema({
     text: {
       type: String,
@@ -74,7 +71,7 @@ export default (
     [field]: {
       type: multiple ? [commentSchema] : commentSchema,
       required,
-      default: defaultValue,
+      default: multiple ? [] : undefined,
     },
   });
 };

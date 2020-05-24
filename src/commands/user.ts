@@ -1,15 +1,13 @@
-/* tslint:disable:no-console */
 import yargs from 'yargs';
 
 import connectMongoose from '../helpers/mongoose';
-import User, { Role } from '../models/user';
+import UserModel, { Role } from '../models/user';
 
-// tslint:disable-next-line:no-unused-expression
 export default yargs
   .command(
     'create <email> <password>',
     'Create user command',
-    commandYarg => {
+    (commandYarg) => {
       commandYarg
         .positional('email', {
           describe: 'Email to be used',
@@ -23,28 +21,28 @@ export default yargs
         .describe('a', 'Should the user be admin?')
         .boolean('a');
     },
-    async argv => {
+    async (argv) => {
       const { username, email, password, admin } = argv;
 
       try {
-        await connectMongoose();
-        await User.create({
+        const connection = await connectMongoose();
+        await UserModel.create({
           username,
           email,
           password,
           role: admin ? Role.admin : Role.user,
         });
         console.log('User created');
+        await connection.disconnect();
       } catch (e) {
         console.log(`Error while creating user ${e.message}`);
       }
-      process.exit();
     },
   )
   .command(
     'updatePassword <email> <password>',
     `Update an user's password command`,
-    commandYarg => {
+    (commandYarg) => {
       commandYarg
         .positional('email', {
           describe: 'Email to be used',
@@ -59,8 +57,8 @@ export default yargs
       const { email, password } = argv;
 
       try {
-        await connectMongoose();
-        const user = await User.findOne({
+        const connection = await connectMongoose();
+        const user = await UserModel.findOne({
           email,
         });
 
@@ -71,11 +69,10 @@ export default yargs
           await user.save();
           console.log('Password updated');
         }
+        await connection.disconnect();
       } catch (e) {
         console.log(`Error while updating user's password ${e.message}`);
       }
-
-      process.exit();
     },
   )
   .demandCommand().argv;

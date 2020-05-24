@@ -1,8 +1,8 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
 
-import timestamps, { IWithCreated, IWithUpdated } from '../middleware/mongoose/timestamps';
+import timestamps, { WithCreated, WithUpdated } from '../middleware/mongoose/timestamps';
 
-export interface ITag extends Document, IWithCreated, IWithUpdated {
+export interface Tag extends Document, WithCreated, WithUpdated {
   name: string;
 }
 
@@ -11,10 +11,10 @@ const TagSchema = new Schema(
     name: {
       type: String,
       required: true,
-      index: "text",
+      index: 'text',
     },
   },
   { collection: 'tags' },
 ).plugin(timestamps);
 
-module.exports = model<ITag>('Tag', TagSchema);
+module.exports = model<Tag>('Tag', TagSchema);

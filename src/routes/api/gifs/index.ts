@@ -1,6 +1,7 @@
+import { promisify } from 'util';
+
 import { Router } from 'express';
 import multer from 'multer';
-import { promisify } from 'util';
 
 import config from '../../../../config.json';
 import jwtAuthMiddleware from '../../../middleware/express/jwtAuth';
