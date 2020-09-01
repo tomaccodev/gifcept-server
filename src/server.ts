@@ -19,6 +19,7 @@ const app = express();
 const startServer = async (): Promise<void> => {
   // Configure body parser to accept json
   app.use(bodyParser.json({ limit: '20mb' }));
+  // Configure body parser to accept urlencoded (file uploads)
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
   // Configure some security headers
